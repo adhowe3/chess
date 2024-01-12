@@ -8,9 +8,10 @@ package chess;
  */
 public class ChessBoard {
 
+    private ChessPiece[][] board;
     public ChessBoard() {
+        this.board = new ChessPiece[7][7];
     }
-    private ChessPiece[][] board = new ChessPiece[7][7];
 
     /**
      * Adds a chess piece to the chessboard

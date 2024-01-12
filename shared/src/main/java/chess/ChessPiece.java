@@ -10,7 +10,7 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
     }
 
     /**
@@ -57,16 +57,38 @@ public class ChessPiece {
             case ROOK:
                 break;
             case BISHOP:
-                possibleMoves = getBishopMoves(myPosition);
+                possibleMoves = getBishopMoves(board, myPosition);
                 break;
             case KNIGHT:
                 break;
             case PAWN:
                 break;
         }
-
     }
 
-    public Collection<ChessMove> getBishopMoves(ChessPosition myPosition) {
-        
+    public Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves;
+        int col = myPosition.getColumn();
+        int row = myPosition.getColumn();
+        for(int i = 0; i <= 7; i++){
+            if(row+i <= 7 && col+i <= 7){
+                ChessPosition pos = new ChessPosition(row+i,col+i);
+                if(board.getPiece(pos) == null){
+                    possibleMoves.add();
+                }
+            }
+            if(row-i >= 0 && col+i <= 7){
+                ChessPosition pos = new ChessPosition(row-i,col+i);
+                board.getPiece(pos);
+            }
+            if(row+i <= 7 && col-i >= 0){
+                ChessPosition pos = new ChessPosition(row+i,col-i);
+                board.getPiece(pos);
+            }
+            if(row-i >= 0 && col-i >=0){
+                ChessPosition pos = new ChessPosition(row-i,col-i);
+                board.getPiece(pos);
+            }
+            
+        }
     }

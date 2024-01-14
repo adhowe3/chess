@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Objects;
 
 import static chess.ChessPiece.PieceType.PAWN;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 /**
  * Represents a single chess piece
@@ -61,6 +63,7 @@ public class ChessPiece {
         ChessPiece myPiece = board.getPiece(myPosition);
         switch (myPiece.getPieceType()) {
             case KING:
+                possibleMoves = getKingMoves(board, myPosition);
                 break;
             case QUEEN:
                 break;
@@ -167,6 +170,76 @@ public class ChessPiece {
         }
         return possibleMoves;
     }
+
+    public Collection<ChessMove> getKingMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        ChessPosition endPos = new ChessPosition(row + 1, col);
+        if(isValidMove(myPosition, endPos, board)){
+            ChessMove move = new ChessMove(myPosition, endPos, null);
+            possibleMoves.add(move);
+        }
+
+        ChessPosition endPos1 = new ChessPosition(row, col + 1);
+        if(isValidMove(myPosition, endPos1, board)){
+            ChessMove move = new ChessMove(myPosition, endPos1, null);
+            possibleMoves.add(move);
+        }
+
+        ChessPosition endPos2 = new ChessPosition(row - 1, col);
+        if(isValidMove(myPosition, endPos2, board)){
+            ChessMove move = new ChessMove(myPosition, endPos2, null);
+            possibleMoves.add(move);
+        }
+
+        ChessPosition endPos3 = new ChessPosition(row, col - 1);
+        if(isValidMove(myPosition, endPos3, board)){
+            ChessMove move = new ChessMove(myPosition, endPos3, null);
+            possibleMoves.add(move);
+        }
+
+        ChessPosition endPos4 = new ChessPosition(row-1, col-1);
+        if(isValidMove(myPosition, endPos4, board)){
+            ChessMove move = new ChessMove(myPosition, endPos4, null);
+            possibleMoves.add(move);
+        }
+
+        ChessPosition endPos5 = new ChessPosition(row+1, col-1);
+        if(isValidMove(myPosition, endPos5, board)){
+            ChessMove move = new ChessMove(myPosition, endPos5, null);
+            possibleMoves.add(move);
+        }
+
+        ChessPosition endPos6 = new ChessPosition(row-1, col+1);
+        if(isValidMove(myPosition, endPos6, board)){
+            ChessMove move = new ChessMove(myPosition, endPos6, null);
+            possibleMoves.add(move);
+        }
+
+        ChessPosition endPos7 = new ChessPosition(row+1, col+1);
+        if(isValidMove(myPosition, endPos7, board)){
+            ChessMove move = new ChessMove(myPosition, endPos7, null);
+            possibleMoves.add(move);
+        }
+        return possibleMoves;
+    }
+
+
+    public Boolean isValidMove(ChessPosition myPosition, ChessPosition endPos, ChessBoard board){
+        // check that it is inside the board
+        if(endPos.getRow() <= MAX_BOARD_INDEX+1 && endPos.getColumn() <= MAX_BOARD_INDEX+1 &&
+            endPos.getRow() > 0 && endPos.getColumn() > 0) {
+            if(board.getPiece(endPos) == null) {
+                return TRUE;
+            }
+            else if(board.getPiece(myPosition).getTeamColor() != board.getPiece(endPos).getTeamColor()) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+
 
 
 // END CLASS

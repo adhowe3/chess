@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
 
 import static chess.ChessPiece.PieceType.PAWN;
 import static java.lang.Boolean.FALSE;
@@ -19,6 +20,8 @@ public class ChessPiece {
     private PieceType type;
     private ChessGame.TeamColor pieceColor;
     public static final int MAX_BOARD_INDEX = 7;
+    public static final int NULL_SPOT = 1;
+    public static final int OPPOSITE_COLOR_SPOT = 2;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.type = type;
@@ -73,6 +76,7 @@ public class ChessPiece {
                 possibleMoves = getBishopMoves(board, myPosition);
                 break;
             case KNIGHT:
+                possibleMoves = getKnightMoves(board, myPosition);
                 break;
             case PAWN:
                 break;
@@ -225,20 +229,126 @@ public class ChessPiece {
         return possibleMoves;
     }
 
+    public Collection<ChessMove> getKnightMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
 
-    public Boolean isValidMove(ChessPosition myPosition, ChessPosition endPos, ChessBoard board){
+        // Case 1
+        ChessPosition endPos = new ChessPosition(row+1, col+2);
+        if(isValidMove(myPosition, endPos, board)){
+            ChessMove move = new ChessMove(myPosition, endPos, null);
+            possibleMoves.add(move);
+        }
+
+        // Case 2
+        ChessPosition endPos1 = new ChessPosition(row+1, col-2);
+        if(isValidMove(myPosition, endPos1, board)){
+            ChessMove move = new ChessMove(myPosition, endPos1, null);
+            possibleMoves.add(move);
+        }
+
+        // Case 3
+        ChessPosition endPos2 = new ChessPosition(row+2, col+1);
+        if(isValidMove(myPosition, endPos2, board)){
+            ChessMove move = new ChessMove(myPosition, endPos2, null);
+            possibleMoves.add(move);
+        }
+
+        // Case 4
+        ChessPosition endPos3 = new ChessPosition(row+2, col-1);
+        if(isValidMove(myPosition, endPos3, board)){
+            ChessMove move = new ChessMove(myPosition, endPos3, null);
+            possibleMoves.add(move);
+        }
+
+        // Case 5
+        ChessPosition endPos4 = new ChessPosition(row-1, col+2);
+        if(isValidMove(myPosition, endPos4, board)){
+            ChessMove move = new ChessMove(myPosition, endPos4, null);
+            possibleMoves.add(move);
+        }
+
+        // Case 6
+        ChessPosition endPos5 = new ChessPosition(row-1, col-2);
+        if(isValidMove(myPosition, endPos5, board)){
+            ChessMove move = new ChessMove(myPosition, endPos5, null);
+            possibleMoves.add(move);
+        }
+
+        // Case 7
+        ChessPosition endPos6 = new ChessPosition(row-2, col+1);
+        if(isValidMove(myPosition, endPos6, board)){
+            ChessMove move = new ChessMove(myPosition, endPos6, null);
+            possibleMoves.add(move);
+        }
+
+        // Case 8
+        ChessPosition endPos7 = new ChessPosition(row-2, col-1);
+        if(isValidMove(myPosition, endPos7, board)){
+            ChessMove move = new ChessMove(myPosition, endPos7, null);
+            possibleMoves.add(move);
+        }
+        return possibleMoves;
+    }
+
+    public Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        // White adds to ROW, Black subtracts from ROW
+
+        if(this.pieceColor == ChessGame.TeamColor.WHITE){
+            ChessPosition endPos1 = new ChessPosition(row+1, col);
+            if(NULL_SPOT == isValidMove(myPosition, endPos1, board)){
+                ChessMove move = new ChessMove(myPosition, endPos1, null);
+                possibleMoves.add(move);
+            }
+
+            //check attack
+            ChessPosition endPos2 = new ChessPosition(row+1, col+1);
+            if(OPPOSITE_COLOR_SPOT == isValidMove(myPosition, endPos2, board)){
+                ChessMove move = new ChessMove(myPosition, endPos2, null);
+                possibleMoves.add(move);
+            }
+
+            //check attack 2
+            ChessPosition endPos3 = new ChessPosition(row+1, col-1);
+            if(OPPOSITE_COLOR_SPOT == isValidMove(myPosition, endPos3, board)){
+                ChessMove move = new ChessMove(myPosition, endPos3, null);
+                possibleMoves.add(move);
+            }
+
+            // check first move, is 2 spaces, row 2 is starting for white pawns
+            if(myPosition.getRow() == 2) {
+                ChessPosition endPos4 = new ChessPosition(row + 2, col);
+                if (OPPOSITE_COLOR_SPOT == isValidMove(myPosition, endPos4, board)) {
+                    ChessMove move = new ChessMove(myPosition, endPos4, null);
+                    possibleMoves.add(move);
+                }
+            }
+        }
+
+        return possibleMoves;
+
+    }
+
+
+    public int isValidMove(ChessPosition myPosition, ChessPosition endPos, ChessBoard board){
         // check that it is inside the board
         if(endPos.getRow() <= MAX_BOARD_INDEX+1 && endPos.getColumn() <= MAX_BOARD_INDEX+1 &&
             endPos.getRow() > 0 && endPos.getColumn() > 0) {
             if(board.getPiece(endPos) == null) {
-                return TRUE;
+                return NULL_SPOT;
             }
             else if(board.getPiece(myPosition).getTeamColor() != board.getPiece(endPos).getTeamColor()) {
-                return TRUE;
+                return OPPOSITE_COLOR_SPOT;
             }
         }
-        return FALSE;
+        return 0;
     }
+
 
 
 

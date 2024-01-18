@@ -62,6 +62,6 @@ public class ChessMove {
     }
 
     public String toString(){
-        return String.format("{start: %s, end: %s}",this.startPosition, this.endPosition);
+        return String.format("{start: %s, end: %s, promo: %s}",this.startPosition, this.endPosition, this.promotionPiece);
     }
 }

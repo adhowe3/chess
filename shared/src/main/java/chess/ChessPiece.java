@@ -5,11 +5,6 @@ import chess.pieces.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
-
-import static chess.ChessPiece.PieceType.PAWN;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 /**
  * Represents a single chess piece

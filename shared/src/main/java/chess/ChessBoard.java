@@ -1,5 +1,7 @@
 package chess;
 
+import chess.pieces.KingMoves;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -28,6 +30,27 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board[position.getRow()-1][position.getColumn()-1] = piece;
+    }
+
+    public void removePiece(ChessPosition position){
+        board[position.getRow() - 1][position.getColumn()-1] = null;
+    }
+
+    // returns the given color king's ChessPosition, if not found, returns null
+    public ChessPosition getKingPosition(ChessGame.TeamColor color){
+        ChessPiece King = new ChessPiece(color, ChessPiece.PieceType.KING);
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
+                ChessPosition pos = new ChessPosition(i,j);
+                // if it's the type king, and matching color, return position
+                if(getPiece(pos) == null) continue;
+                if(getPiece(pos).getPieceType() == ChessPiece.PieceType.KING
+                    && getPiece(pos).getTeamColor() == color) {
+                    return pos;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -84,6 +107,18 @@ public class ChessBoard {
         int result = Objects.hash(white, black);
         result = 31 * result + Arrays.deepHashCode(board);
         return result;
+    }
+
+    public ChessBoard getCopy(){
+        ChessBoard copyBoard = new ChessBoard();
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
+                ChessPosition pos = new ChessPosition(i,j);
+                if(getPiece(pos) == null) continue;
+                copyBoard.addPiece(pos, new ChessPiece(getPiece(pos).getTeamColor(), getPiece(pos).getPieceType()));
+            }
+        }
+        return copyBoard;
     }
 
     @Override

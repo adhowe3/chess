@@ -83,15 +83,23 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessGame tempGame = new ChessGame();
-        tempGame.setBoard(gameBoard);
-        tempGame.getBoard().addPiece(move.getEndPosition(), tempGame.getBoard().getPiece(move.getStartPosition()));
-        if(tempGame.isInCheck(getTeamTurn())){
-            throw new InvalidMoveException();
+        if(gameBoard.getPiece(move.getStartPosition()) == null){
+            throw new InvalidMoveException("Invalid Move");
         }
-        else{
+        ChessGame tempGame = new ChessGame();
+        tempGame.setBoard(gameBoard.getCopy());
+        tempGame.getBoard().addPiece(move.getEndPosition(), tempGame.getBoard().getPiece(move.getStartPosition()));
+        tempGame.getBoard().removePiece(move.getEndPosition());
+        if(tempGame.isInCheck(getTeamTurn())){
+            throw new InvalidMoveException("Invalid Move");
+        }
+        // the end move must be contained in the pieceMoves
+        else if(gameBoard.getPiece(move.getStartPosition()).pieceMoves(gameBoard, move.getStartPosition()).contains(move.getEndPosition())){
             gameBoard.addPiece(move.getEndPosition(), gameBoard.getPiece(move.getStartPosition()));
             gameBoard.removePiece(move.getStartPosition());
+        }
+        else{
+            throw new InvalidMoveException("Invalid Move");
         }
     }
 
@@ -104,7 +112,6 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPos = gameBoard.getKingPosition(teamColor);
         Collection<ChessMove> possibleAttackMoves = new ArrayList<>();
-        System.out.print(gameBoard.toString());
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j++){
                 ChessPosition currPos = new ChessPosition(i,j);

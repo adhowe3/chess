@@ -138,8 +138,8 @@ public class ChessGame {
                 }
             }
         }
+        // loop through the moves of all the possibleAttackMoves and see if any match the kings position
         for(ChessMove move : possibleAttackMoves){
-            // now loop through opponents possible moves and see if any match with the king
             if(move.getEndPosition().equals(kingPos)){
                 return true;
             }

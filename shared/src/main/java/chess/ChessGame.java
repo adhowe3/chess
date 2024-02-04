@@ -84,16 +84,20 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece pieceToMove = gameBoard.getPiece(move.getStartPosition());
+        // there is no piece at start positions
         if(pieceToMove == null){
             throw new InvalidMoveException("No piece at this position");
         }
+        // this is not their turn
         if(pieceToMove.getTeamColor() != currTeamTurn){
             throw new InvalidMoveException("Not your turn");
         }
         Collection<ChessMove> possibleMoves = new ArrayList<>(pieceToMove.pieceMoves(gameBoard, move.getStartPosition()));
+        // the endPosition of the move is not in the possible moves of hte piece
         if (!possibleMoves.contains(move)) {
             throw new InvalidMoveException("This move is not allowed for this piece");
         }
+        // run a test game and see if this move puts their king in check
         ChessGame tempGame = new ChessGame();
         tempGame.setBoard(gameBoard.getCopy());
         tempGame.getBoard().addPiece(move.getEndPosition(), tempGame.getBoard().getPiece(move.getStartPosition()));
@@ -121,6 +125,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPos = gameBoard.getKingPosition(teamColor);
         Collection<ChessMove> possibleAttackMoves = new ArrayList<>();
+        // loop through the board positions
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j++){
                 ChessPosition currPos = new ChessPosition(i,j);

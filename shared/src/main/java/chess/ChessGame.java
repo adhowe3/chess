@@ -25,6 +25,7 @@ public class ChessGame {
         return currTeamTurn;
     }
 
+    // This is helpful to get the opposite of whatever color you pass in
     public TeamColor getOppositeColor(TeamColor color){
         if(color == TeamColor.WHITE){
             return TeamColor.BLACK;

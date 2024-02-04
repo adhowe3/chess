@@ -108,6 +108,7 @@ public class ChessGame {
         }
         // the end move must be contained in the pieceMoves
         else{
+            // case that it is a PAWN need to check for promotion pieces
             if(move.getPromotionPiece() != null){
                 gameBoard.addPiece(move.getEndPosition(), new ChessPiece(pieceToMove.getTeamColor(), move.getPromotionPiece()));
             }

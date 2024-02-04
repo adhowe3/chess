@@ -32,6 +32,7 @@ public class ChessBoard {
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
+    // This is removes a piece at a given position at the board
     public void removePiece(ChessPosition position){
         board[position.getRow() - 1][position.getColumn()-1] = null;
     }
@@ -109,6 +110,7 @@ public class ChessBoard {
         return result;
     }
 
+    // This returns a deep copy of the chess board
     public ChessBoard getCopy(){
         ChessBoard copyBoard = new ChessBoard();
         for(int i = 1; i < 9; i++){

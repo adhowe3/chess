@@ -12,7 +12,9 @@ import java.util.Collection;
 public class ChessGame {
 
     public ChessGame() {
-
+        this.gameBoard = new ChessBoard();
+        gameBoard.resetBoard();
+        currTeamTurn = TeamColor.WHITE;
     }
 
     private ChessBoard gameBoard;

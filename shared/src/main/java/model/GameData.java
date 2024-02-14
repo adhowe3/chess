@@ -10,6 +10,14 @@ public class GameData {
     private final String gameName;
     private final ChessGame game;
 
+    GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){
+        this.gameID = gameID;
+        this.whiteUsername = whiteUsername;
+        this.blackUsername = blackUsername;
+        this.gameName = gameName;
+        this.game = game;
+    }
+
     public int getGameID() {
         return gameID;
     }

@@ -11,6 +11,7 @@ import java.util.Collection;
  */
 public class ChessGame {
 
+    // Chess game constructor. Should initialize the board, and set white turn first
     public ChessGame() {
         this.gameBoard = new ChessBoard();
         gameBoard.resetBoard();

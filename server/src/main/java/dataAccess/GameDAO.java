@@ -1,5 +1,5 @@
 package dataAccess;
 
 public interface GameDAO {
-    //FIX ME
+    void clearGameData();
 }

@@ -1,8 +1,16 @@
 package server;
-
+import service.GameService;
+import handlers.Handler;
 import spark.*;
 
+
 public class Server {
+
+    private GameService service;
+    private Handler handler;
+    public Server(){
+        handler = new Handler();
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -10,7 +18,9 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.delete("/db", (req, res) -> handler.clear(req, res));
 
+        Spark.init();
         Spark.awaitInitialization();
         return Spark.port();
     }
@@ -19,4 +29,5 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+
 }

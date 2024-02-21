@@ -95,5 +95,13 @@ public class ChessPiece {
         return Objects.hash(type, pieceColor);
     }
 
-// END CLASS
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "type=" + type +
+                ", pieceColor=" + pieceColor +
+                '}';
+    }
+
+    // END CLASS
 }

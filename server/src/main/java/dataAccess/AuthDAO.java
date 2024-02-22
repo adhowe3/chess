@@ -7,4 +7,6 @@ import java.util.List;
 public interface AuthDAO {
     void clearAuthData();
 
+    public void add(AuthData data);
+
 }

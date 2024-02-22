@@ -24,7 +24,7 @@ public class Handler {
         return "{}";
     }
 
-    public Object register(Request req, Response res){
+    public Object register(Request req, Response res) {
         UserService service = new UserService(userDao, authDao);
         RegisterRequest objReq = serializer.fromJson(req.body(), RegisterRequest.class);
 
@@ -32,12 +32,13 @@ public class Handler {
             RegisterResult objRes = service.register(objReq);
             res.body(serializer.toJson(objRes));
         }
-        catch(Exception e){
+        catch(DataAccessException e){
             if(e.getMessage().equals("Error: already taken")){
                 Message msg = new Message(e.getMessage());
                 res.status(403);
                 res.body(serializer.toJson(msg));
             }
+
         }
         System.out.println(res.body());
         return res.body();

@@ -255,7 +255,6 @@ public class StandardAPITests {
         Assertions.assertNull(registerResult.authToken, "Response incorrectly contained authentication string");
     }
 
-
     @Test
     @Order(8)
     @DisplayName("Register Bad Request")

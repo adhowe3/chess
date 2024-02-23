@@ -2,9 +2,7 @@ package handlers;
 import com.google.gson.Gson;
 import dataAccess.GameDAO;
 import dataAccess.MemoryGameDAO;
-import model.Message;
-import model.RegisterRequest;
-import model.RegisterResult;
+import model.*;
 import service.UserService;
 import spark.Response;
 import spark.Request;
@@ -18,8 +16,8 @@ public class Handler {
     public Handler(){}
 
     public Object clear(Request req, Response res){
-        DbService service = new DbService();
-        service.clear(authDao, gameDao, userDao);
+        DbService service = new DbService(authDao, gameDao, userDao);
+        service.clear();
         res.status(200);
         return "{}";
     }
@@ -33,14 +31,37 @@ public class Handler {
             res.body(serializer.toJson(objRes));
         }
         catch(DataAccessException e){
+            Message msg = new Message(e.getMessage());
+            res.body(serializer.toJson(msg));
             if(e.getMessage().equals("Error: already taken")){
-                Message msg = new Message(e.getMessage());
                 res.status(403);
-                res.body(serializer.toJson(msg));
+            }
+            if(e.getMessage().equals("Error: bad request")){
+                res.status(400);
             }
 
         }
         System.out.println(res.body());
         return res.body();
     }
+
+    public Object login(Request req, Response res){
+        UserService service = new UserService(userDao, authDao);
+        LoginRequest objReq = serializer.fromJson(req.body(), LoginRequest.class);
+
+        try{
+            LoginResult objRes = service.login(objReq);
+            res.body(serializer.toJson(objRes));
+        }
+        catch(DataAccessException e){
+            Message msg = new Message(e.getMessage());
+            res.body(serializer.toJson(msg));
+            if(e.getMessage().equals("Error: unauthorized")){
+                res.status(401);
+            }
+        }
+        System.out.println(res.body());
+        return res.body();
+    }
+
 }

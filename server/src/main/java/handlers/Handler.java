@@ -64,4 +64,22 @@ public class Handler {
         return res.body();
     }
 
+    public Object logout(Request req, Response res){
+        UserService service = new UserService(userDao, authDao);
+        LogoutRequest objReq = serializer.fromJson(req.body(), LogoutRequest.class);
+
+        try{
+            service.logout(objReq);
+        }
+        catch(DataAccessException e){
+            Message msg = new Message(e.getMessage());
+            res.body(serializer.toJson(msg));
+            if(e.getMessage().equals("Error: unauthorized")){
+                res.status(401);
+            }
+        }
+        System.out.println(res.body());
+        return res.body();
+    }
+
 }

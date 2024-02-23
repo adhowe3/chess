@@ -11,8 +11,9 @@ public interface AuthDAO {
 
     public String getAuthToken(String username);
 
-    public void delete(AuthData data);
+    public String getAuthTokenFromToken(String authToken);
 
+    public boolean delete(String authToken);
     public ArrayList<AuthData> getAll();
 
 }

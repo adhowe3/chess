@@ -13,8 +13,6 @@ public interface UserDAO {
 
     boolean add(UserData user);
 
-    String getPassword(String username);
-
     ArrayList<UserData> getAll();
 
 }

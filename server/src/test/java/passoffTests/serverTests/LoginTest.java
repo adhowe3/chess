@@ -34,7 +34,6 @@ public class LoginTest {
 
         assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
         Assertions.assertEquals(userDao.getUser("Allan"),  u);
-
     }
 
     @Test

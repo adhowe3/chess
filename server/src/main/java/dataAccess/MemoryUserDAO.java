@@ -32,16 +32,6 @@ public class MemoryUserDAO implements UserDAO{
         return null;
     }
 
-    @Override
-    public String getPassword(String username){
-        for(UserData user : userData){
-            if(user.getUsername().equals(username)){
-                return user.getPassword();
-            }
-        }
-        return null;
-    }
-
     public ArrayList<UserData> getAll(){
         return userData;
     }

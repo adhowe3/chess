@@ -37,11 +37,9 @@ public class UserService {
 
     public LoginResult login(LoginRequest loginReq) throws DataAccessException{
         if(userDao.getUser(loginReq.username()) == null){
-            //username does not exist in dao
             throw new DataAccessException("Error: unauthorized");
         }
         if(!userDao.getUser(loginReq.username()).getPassword().equals(loginReq.password())){
-            // password does not match request
             throw new DataAccessException("Error: unauthorized");
         }
         String authToken = UUID.randomUUID().toString();

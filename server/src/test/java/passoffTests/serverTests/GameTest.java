@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.GameService;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GameTest {
@@ -28,7 +29,7 @@ public class GameTest {
         req = new CreateGameRequest("testAuthToken", "gameName");
         a = new AuthData("testAuthToken", "Allan");
         authDao.add(a);
-        g = new GameData(1234, "white", "black", "FirstGame", new ChessGame());
+        g = new GameData(1234, "whiteuser", "blackuser", "FirstGame", new ChessGame());
         gameDao.add(g);
         service = new GameService(gameDao, authDao);
     }
@@ -48,8 +49,27 @@ public class GameTest {
     }
 
     @Test
-    public void JoinGameSuccess(){
+    public void JoinGameSuccess() throws DataAccessException{
+        GameData gm = new GameData(123, "", "", "SecondGame", new ChessGame());
+        gameDao.add(gm);
+        AuthData au = new AuthData("testAuth", "Sam");
+        authDao.add(au);
+        JoinGameRequest joinReq = new JoinGameRequest("WHITE", 123, au.getAuthToken());
         service.joinGame(joinReq);
+        GameData compGm = new GameData(123, au.getUsername(), "", "SecondGame", new ChessGame());
+        Assertions.assertEquals(gameDao.getGameData("SecondGame"), compGm);
+    }
+
+    @Test
+    public void JoinGameWhiteTaken() throws DataAccessException{
+        GameData gm = new GameData(123, "John", "", "SecondGame", new ChessGame());
+        gameDao.add(gm);
+        AuthData au = new AuthData("testAuth", "Sam");
+        authDao.add(au);
+        JoinGameRequest joinReq = new JoinGameRequest("WHITE", 123, au.getAuthToken());
+        service.joinGame(joinReq);
+        GameData compGm = new GameData(123, gm.getWhiteUsername(), "", "SecondGame", new ChessGame());
+        Assertions.assertEquals(gameDao.getGameData("SecondGame"), compGm);
     }
 
 

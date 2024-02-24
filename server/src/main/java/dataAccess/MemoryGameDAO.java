@@ -7,7 +7,6 @@ import java.util.Objects;
 public class MemoryGameDAO implements GameDAO{
     private ArrayList<GameData> gameData;
 
-
     public MemoryGameDAO(){
         gameData = new ArrayList<>();
     }
@@ -29,6 +28,26 @@ public class MemoryGameDAO implements GameDAO{
                     return game;
         }
         return null;
+    }
+
+    @Override
+    public GameData getGameDataFromID(int gameID){
+        for(GameData game : gameData){
+            if(game.getGameID() == gameID)
+                return game;
+        }
+        return null;
+    }
+
+    @Override
+    public void updateBlackUsername(int gameID, String username){
+        getGameDataFromID(gameID).setBlackUsername(username);
+    }
+
+    @Override
+    public void updateWhiteUsername(int gameID, String username){
+        getGameDataFromID(gameID).setWhiteUsername(username);
+
     }
 
     @Override

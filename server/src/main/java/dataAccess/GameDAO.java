@@ -11,6 +11,12 @@ public interface GameDAO {
 
     GameData getGameData(String gameName);
 
+    GameData getGameDataFromID(int gameID);
+
+    void updateWhiteUsername(int gameID, String username);
+
+    void updateBlackUsername(int gameID, String username);
+
     int nextGameID();
 
     ArrayList<GameData> getAll();

@@ -61,7 +61,6 @@ public class Handler {
                 res.status(401);
             }
         }
-        res.status(200);
         System.out.println(res.body());
         return res.body();
     }
@@ -80,8 +79,7 @@ public class Handler {
                 res.status(401);
             }
         }
-        System.out.println(res.body());
-        return res.body();
+        return "{}";
     }
 
     public Object createGame(Request req, Response res){
@@ -105,6 +103,7 @@ public class Handler {
                 res.status(400);
             }
         }
+        System.out.print("create game return: ");
         System.out.println(res.body());
         return res.body();
     }

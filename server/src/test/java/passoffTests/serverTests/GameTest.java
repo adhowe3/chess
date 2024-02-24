@@ -47,5 +47,10 @@ public class GameTest {
         Assertions.assertEquals("Error: bad request", exception.getMessage());
     }
 
+    @Test
+    public void JoinGameSuccess(){
+        service.joinGame(joinReq);
+    }
+
 
 }

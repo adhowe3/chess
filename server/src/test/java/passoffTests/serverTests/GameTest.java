@@ -67,10 +67,9 @@ public class GameTest {
         AuthData au = new AuthData("testAuth", "Sam");
         authDao.add(au);
         JoinGameRequest joinReq = new JoinGameRequest("WHITE", 123, au.getAuthToken());
-        service.joinGame(joinReq);
-        GameData compGm = new GameData(123, gm.getWhiteUsername(), "", "SecondGame", new ChessGame());
-        Assertions.assertEquals(gameDao.getGameData("SecondGame"), compGm);
-    }
 
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> service.joinGame(joinReq));
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
+    }
 
 }

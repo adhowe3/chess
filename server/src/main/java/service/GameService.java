@@ -4,10 +4,7 @@ import dataAccess.AuthDAO;
 import dataAccess.GameDAO;
 import dataAccess.MemoryGameDAO;
 import dataAccess.DataAccessException;
-import model.CreateGameRequest;
-import model.CreateGameResponse;
-import model.GameData;
-import model.JoinGameRequest;
+import model.*;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -25,12 +22,12 @@ public class GameService {
         if(authDao.getDataFromToken(gameReq.getAuthorization()) == null){
             throw new DataAccessException("Error: unauthorized");
         }
-        if(gameDao.getGameData(gameReq.getGameName()) != null){
+        if(gameReq.getGameName() == null){
             throw new DataAccessException("Error: bad request");
         }
         String username = authDao.getDataFromToken(gameReq.getAuthorization()).getUsername();
         int newGameId = gameDao.nextGameID();
-        GameData game = new GameData(newGameId, username, null, gameReq.getGameName(), new ChessGame());
+        GameData game = new GameData(newGameId, null, null, gameReq.getGameName(), new ChessGame());
         gameDao.add(game);
         return new CreateGameResponse(newGameId);
     }
@@ -43,28 +40,35 @@ public class GameService {
         String colorRequested = joinReq.getPlayerColor();
         int idRequested = joinReq.getGameID();
         GameData gameRequested = gameDao.getGameDataFromID(joinReq.getGameID());
-        if(colorRequested.isEmpty()){
-            // join as observer
-            return;
+        if(gameRequested == null){
+            throw new DataAccessException("Error: bad request");
         }
+        if(colorRequested == null) return;
         if(colorRequested.equals("BLACK")){
-            if(gameRequested.getBlackUsername().isBlank()){
+            if(gameRequested.getBlackUsername() == null){
                 gameDao.updateBlackUsername(idRequested, usernameRequested);
                 return;
             }
             throw new DataAccessException("Error: already taken");
         }
-        if(colorRequested.equals("WHITE")){
-            if(gameRequested.getWhiteUsername().isBlank()){
+        else if(colorRequested.equals("WHITE")){
+            if(gameRequested.getWhiteUsername() == null){
                 gameDao.updateWhiteUsername(idRequested, usernameRequested);
                 return;
             }
             throw new DataAccessException("Error: already taken");
         }
         else{
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("Error: already taken");
         }
 
+    }
+
+    public ListGamesResponse listGames(String authorization) throws DataAccessException{
+        if(authDao.getDataFromToken(authorization) == null){
+            throw new DataAccessException("Error: unauthorized");
+        }
+        return new ListGamesResponse(gameDao.getAll());
     }
 
 }

@@ -360,7 +360,6 @@ public class StandardAPITests {
                 watchResult.message != null && watchResult.message.toLowerCase(Locale.ROOT).contains("error"),
                 "Result returned an error message");
 
-
         TestModels.TestListResult listResult = serverFacade.listGames(existingAuth);
         Assertions.assertEquals(HttpURLConnection.HTTP_OK, serverFacade.getStatusCode(),
                 "Server response code was not 200 OK");

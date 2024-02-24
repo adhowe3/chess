@@ -53,6 +53,7 @@ public class Handler {
         try{
             LoginResult objRes = service.login(objReq);
             res.body(serializer.toJson(objRes));
+            res.status(200);
         }
         catch(DataAccessException e){
             Message msg = new Message(e.getMessage());
@@ -62,6 +63,7 @@ public class Handler {
             }
         }
         System.out.println(res.body());
+        System.out.println(res.status());
         return res.body();
     }
 
@@ -77,6 +79,7 @@ public class Handler {
             res.body(serializer.toJson(msg));
             if(e.getMessage().equals("Error: unauthorized")){
                 res.status(401);
+                return res.body();
             }
         }
         return "{}";
@@ -88,9 +91,8 @@ public class Handler {
         CreateGameRequest objReq = serializer.fromJson(req.body(), CreateGameRequest.class);
         objReq.setAuthorization(auth);
 
-        System.out.println(objReq);
         try{
-            CreateGameResponse objRes=  service.createGame(objReq);
+            CreateGameResponse objRes = service.createGame(objReq);
             res.body(serializer.toJson(objRes));
         }
         catch(DataAccessException e){
@@ -107,4 +109,46 @@ public class Handler {
         System.out.println(res.body());
         return res.body();
     }
+
+    public Object joinGame(Request req, Response res){
+        GameService service = new GameService(gameDao, authDao);
+        String auth = req.headers("authorization");
+        JoinGameRequest objReq = serializer.fromJson(req.body(), JoinGameRequest.class);
+        objReq.setAuthorization(auth);
+        try{
+            service.joinGame(objReq);
+        }
+        catch(DataAccessException e){
+            Message msg = new Message(e.getMessage());
+            res.body(serializer.toJson(msg));
+            if(e.getMessage().equals("Error: unauthorized")){
+                res.status(401);
+            }
+            if(e.getMessage().equals("Error: bad request")){
+                res.status(400);
+            }
+            if(e.getMessage().equals("Error: already taken")){
+                res.status(403);
+            }
+        }
+        return "{}";
+    }
+
+    public Object listGames(Request req, Response res){
+        GameService service = new GameService(gameDao, authDao);
+        String authorization = req.headers("authorization");
+        try{
+            ListGamesResponse objRes = service.listGames(authorization);
+            res.body(serializer.toJson(objRes));
+        }
+        catch (DataAccessException e){
+            Message msg = new Message(e.getMessage());
+            res.body(serializer.toJson(msg));
+            if(e.getMessage().equals("Error: unauthorized")){
+                res.status(401);
+            }
+        }
+        return res.body();
+    }
+
 }

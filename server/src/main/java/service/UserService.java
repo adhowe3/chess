@@ -38,10 +38,12 @@ public class UserService {
     public LoginResult login(LoginRequest loginReq) throws DataAccessException{
         if(userDao.getUser(loginReq.username()) == null){
             //username does not exist in dao
+            System.out.println("login user does not exits");
             throw new DataAccessException("Error: unauthorized");
         }
         if(!userDao.getUser(loginReq.username()).getPassword().equals(loginReq.password())){
             // password does not match request
+            System.out.println("login password does not match");
             throw new DataAccessException("Error: unauthorized");
         }
         String authToken = UUID.randomUUID().toString();
@@ -50,10 +52,12 @@ public class UserService {
     }
 
     public void logout(LogoutRequest logoutReq) throws DataAccessException{
-        if(logoutReq.authToken() == null){
+        if(logoutReq.authorization() == null){
+            System.out.println("logout authToken is null");
             throw new DataAccessException("Error: unauthorized");
         }
-        if(!authDao.delete(logoutReq.authToken())){
+        if(!authDao.delete(logoutReq.authorization())){
+            System.out.println("logout cannot delete authData");
             throw new DataAccessException("Error: unauthorized");
         }
     }

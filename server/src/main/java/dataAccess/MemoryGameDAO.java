@@ -22,6 +22,20 @@ public class MemoryGameDAO implements GameDAO{
         this.gameData.add(data);
     }
 
+    @Override
+    public GameData getGameData(String gameName){
+        for(GameData game : gameData){
+            if(game.getGameName().equals(gameName))
+                    return game;
+        }
+        return null;
+    }
+
+    @Override
+    public int nextGameID(){
+        return gameData.size() + 1;
+    }
+
     public ArrayList<GameData> getAll(){
         return gameData;
     }

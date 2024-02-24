@@ -32,7 +32,7 @@ public class LoginTest {
         LoginRequest loginReq = new LoginRequest("Allan", "goodpassword");
         service.login(loginReq);
 
-        assertFalse(authDao.getAuthToken("Allan").isEmpty());
+        assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
         Assertions.assertEquals(userDao.getUser("Allan"),  u);
 
     }

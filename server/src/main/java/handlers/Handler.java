@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import dataAccess.GameDAO;
 import dataAccess.MemoryGameDAO;
 import model.*;
+import service.GameService;
 import service.UserService;
 import spark.Response;
 import spark.Request;
@@ -60,13 +61,14 @@ public class Handler {
                 res.status(401);
             }
         }
+        res.status(200);
         System.out.println(res.body());
         return res.body();
     }
 
     public Object logout(Request req, Response res){
         UserService service = new UserService(userDao, authDao);
-        LogoutRequest objReq = serializer.fromJson(req.body(), LogoutRequest.class);
+        LogoutRequest objReq = new LogoutRequest(req.headers("authorization"));
 
         try{
             service.logout(objReq);
@@ -82,4 +84,28 @@ public class Handler {
         return res.body();
     }
 
+    public Object createGame(Request req, Response res){
+        GameService service = new GameService(gameDao, authDao);
+        String auth = req.headers("authorization");
+        CreateGameRequest objReq = serializer.fromJson(req.body(), CreateGameRequest.class);
+        objReq.setAuthorization(auth);
+
+        System.out.println(objReq);
+        try{
+            CreateGameResponse objRes=  service.createGame(objReq);
+            res.body(serializer.toJson(objRes));
+        }
+        catch(DataAccessException e){
+            Message msg = new Message(e.getMessage());
+            res.body(serializer.toJson(msg));
+            if(e.getMessage().equals("Error: unauthorized")){
+                res.status(401);
+            }
+            if(e.getMessage().equals("Error: bad request")){
+                res.status(400);
+            }
+        }
+        System.out.println(res.body());
+        return res.body();
+    }
 }

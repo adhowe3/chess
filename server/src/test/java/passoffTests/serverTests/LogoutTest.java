@@ -31,12 +31,12 @@ public class LogoutTest {
     @Test
     public void logoutSuccess() throws DataAccessException{
 
-        Assertions.assertFalse(authDao.getAuthToken("Allan").isEmpty());
+        Assertions.assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
 
         LogoutRequest logoutReq = new LogoutRequest("testAuthToken");
         service.logout(logoutReq);
 
-        Assertions.assertTrue(authDao.getAuthToken("Allan").isEmpty());
+        Assertions.assertNull(authDao.getDataFromUser("Allan"));
         Assertions.assertEquals(userDao.getUser("Allan"),  u);
 
     }

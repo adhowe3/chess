@@ -9,9 +9,8 @@ public interface AuthDAO {
 
     public void add(AuthData data);
 
-    public String getAuthToken(String username);
-
-    public String getAuthTokenFromToken(String authToken);
+    public AuthData getDataFromUser(String username);
+    public AuthData getDataFromToken(String authToken);
 
     public boolean delete(String authToken);
     public ArrayList<AuthData> getAll();

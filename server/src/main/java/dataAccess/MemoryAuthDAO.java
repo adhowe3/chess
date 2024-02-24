@@ -1,5 +1,7 @@
 package dataAccess;
 import model.AuthData;
+import model.GameData;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -25,21 +27,21 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public String getAuthToken(String username){
+    public AuthData getDataFromUser(String username){
         for(AuthData data : authData){
             if(data.getUsername().equals(username))
-                return data.getAuthToken();
+                return data;
         }
-        return "";
+        return null;
     }
 
     @Override
-    public String getAuthTokenFromToken(String authToken){
+    public AuthData getDataFromToken(String authToken){
         for(AuthData data : authData){
             if(data.getAuthToken().equals(authToken))
-                return data.getAuthToken();
+                return data;
         }
-        return "";
+        return null;
     }
 
     @Override

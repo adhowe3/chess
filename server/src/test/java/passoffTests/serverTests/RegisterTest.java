@@ -33,7 +33,7 @@ public class RegisterTest {
 
         UserData u = new UserData("Allan", "goodpassword", "myemail@ymail.com");
 
-        Assertions.assertNotEquals(authDao.getAuthToken("Allan"), "");
+        Assertions.assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
         Assertions.assertEquals(userDao.getUser("Allan"),  u);
 
     }

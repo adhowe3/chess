@@ -799,7 +799,6 @@ public class StandardAPITests {
         Assertions.assertEquals(0, listResult.games.length, "list result did not return 0 games after clear");
     }
 
-
     @Test
     @Order(24)
     @DisplayName("Multiple Clears")

@@ -52,9 +52,10 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public int nextGameID(){
-        return gameData.size();
+        return gameData.size() + 1;
     }
 
+    @Override
     public ArrayList<GameData> getAll(){
         return gameData;
     }

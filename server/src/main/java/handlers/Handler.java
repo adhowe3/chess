@@ -1,5 +1,6 @@
 package handlers;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dataAccess.GameDAO;
 import dataAccess.MemoryGameDAO;
 import model.*;
@@ -9,6 +10,8 @@ import spark.Response;
 import spark.Request;
 import service.DbService;
 import dataAccess.*;
+import com.google.gson.Gson;
+
 public class Handler {
     private GameDAO gameDao = new MemoryGameDAO();
     private AuthDAO authDao = new MemoryAuthDAO();
@@ -112,9 +115,9 @@ public class Handler {
 
     public Object joinGame(Request req, Response res){
         GameService service = new GameService(gameDao, authDao);
-        String auth = req.headers("authorization");
         JoinGameRequest objReq = serializer.fromJson(req.body(), JoinGameRequest.class);
-        objReq.setAuthorization(auth);
+        objReq.setAuthorization(req.headers("authorization"));
+        System.out.print(req.headers("authorization"));
         try{
             service.joinGame(objReq);
         }
@@ -124,15 +127,24 @@ public class Handler {
             if(e.getMessage().equals("Error: unauthorized")){
                 res.status(401);
             }
-            if(e.getMessage().equals("Error: bad request")){
+            else if(e.getMessage().equals("Error: bad request")){
                 res.status(400);
             }
-            if(e.getMessage().equals("Error: already taken")){
+            else if(e.getMessage().equals("Error: already taken")){
                 res.status(403);
             }
+            return res.body();
         }
         return "{}";
     }
+
+    public JoinGameRequest extractJoinGameRequest(spark.Request req) {
+        String authorization = req.headers("authorization");
+        Integer gameID = req.queryParams("gameID") != null ? Integer.parseInt(req.queryParams("gameID")) : null;
+        String playerColor = req.queryParams("playerColor");
+        return new JoinGameRequest(authorization, playerColor, gameID);
+    }
+
 
     public Object listGames(Request req, Response res){
         GameService service = new GameService(gameDao, authDao);

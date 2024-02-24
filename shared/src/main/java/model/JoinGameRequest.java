@@ -3,16 +3,18 @@ package model;
 import java.util.Objects;
 
 public class JoinGameRequest {
-    private String playerColor;
-    private int GameID;
     private String authorization;
+    private String playerColor;
+    private Integer gameID;
 
-    public JoinGameRequest(String playerColor, int gameID, String authorization) {
-        this.playerColor = playerColor;
-        this.GameID = gameID;
+    public JoinGameRequest(String authorization, String playerColor, Integer gameID) {
         this.authorization = authorization;
+        this.playerColor = playerColor;
+        this.gameID = gameID;
     }
-
+    public JoinGameRequest(int gameID){
+        this.gameID = gameID;
+    }
     public String getPlayerColor() {
         return playerColor;
     }
@@ -21,15 +23,11 @@ public class JoinGameRequest {
         this.playerColor = playerColor;
     }
 
-    public int getGameID() {
-        return GameID;
+    public Integer getgameID() {
+        return gameID;
     }
 
-    public void setGameID(int gameID) {
-        GameID = gameID;
-    }
-
-    public String getAuthorization() {
+    public String getAuthorization(){
         return authorization;
     }
 
@@ -37,16 +35,7 @@ public class JoinGameRequest {
         this.authorization = authorization;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        JoinGameRequest that = (JoinGameRequest) o;
-        return GameID == that.GameID && Objects.equals(playerColor, that.playerColor) && Objects.equals(authorization, that.authorization);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(playerColor, GameID, authorization);
+    public void setGameID(Integer gameID) {
+        this.gameID = gameID;
     }
 }

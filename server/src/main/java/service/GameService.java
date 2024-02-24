@@ -38,8 +38,8 @@ public class GameService {
         }
         String usernameRequested = authDao.getDataFromToken(joinReq.getAuthorization()).getUsername();
         String colorRequested = joinReq.getPlayerColor();
-        int idRequested = joinReq.getGameID();
-        GameData gameRequested = gameDao.getGameDataFromID(joinReq.getGameID());
+        int idRequested = joinReq.getgameID();
+        GameData gameRequested = gameDao.getGameDataFromID(joinReq.getgameID());
         if(gameRequested == null){
             throw new DataAccessException("Error: bad request");
         }

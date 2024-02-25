@@ -6,6 +6,9 @@ import model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import requests.CreateGameRequest;
+import requests.JoinGameRequest;
+import responses.CreateGameResponse;
 import service.GameService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

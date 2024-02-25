@@ -1,8 +1,7 @@
 package passoffTests.serverTests;
 
 import dataAccess.*;
-import model.LoginRequest;
-import model.RegisterRequest;
+import requests.LoginRequest;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

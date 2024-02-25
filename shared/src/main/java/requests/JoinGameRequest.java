@@ -1,4 +1,4 @@
-package model;
+package requests;
 
 import java.util.Objects;
 

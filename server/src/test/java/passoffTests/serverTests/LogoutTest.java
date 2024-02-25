@@ -5,6 +5,7 @@ import model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import requests.LogoutRequest;
 import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;

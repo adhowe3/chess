@@ -1,4 +1,4 @@
-package model;
+package requests;
 
 public class CreateGameRequest {
 

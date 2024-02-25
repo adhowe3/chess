@@ -2,11 +2,12 @@ package service;
 import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.GameDAO;
-import dataAccess.MemoryGameDAO;
 import dataAccess.DataAccessException;
 import model.*;
-
-import java.util.concurrent.ThreadLocalRandom;
+import requests.CreateGameRequest;
+import requests.JoinGameRequest;
+import responses.CreateGameResponse;
+import responses.ListGamesResponse;
 
 public class GameService {
 

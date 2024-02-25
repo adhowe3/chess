@@ -3,6 +3,11 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.*;
+import requests.LoginRequest;
+import requests.LogoutRequest;
+import requests.RegisterRequest;
+import responses.LoginResult;
+import responses.RegisterResult;
 
 import java.util.UUID;
 

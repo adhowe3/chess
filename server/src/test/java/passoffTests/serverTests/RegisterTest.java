@@ -1,16 +1,11 @@
 package passoffTests.serverTests;
 
-import chess.ChessGame;
 import dataAccess.*;
-import model.AuthData;
-import model.GameData;
-import model.RegisterRequest;
+import requests.RegisterRequest;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.Server;
-import service.DbService;
 import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -3,14 +3,17 @@ import com.google.gson.Gson;
 import dataAccess.GameDAO;
 import dataAccess.MemoryGameDAO;
 import model.*;
+import requests.*;
+import responses.CreateGameResponse;
+import responses.ListGamesResponse;
+import responses.LoginResult;
+import responses.RegisterResult;
 import service.GameService;
 import service.UserService;
 import spark.Response;
 import spark.Request;
 import service.DbService;
 import dataAccess.*;
-
-import javax.xml.crypto.Data;
 
 public class Handler {
     private GameDAO gameDao = new MemoryGameDAO();

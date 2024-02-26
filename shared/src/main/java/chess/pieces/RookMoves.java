@@ -7,7 +7,7 @@ import chess.ChessPosition;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class RookMoves implements PieceMoves{
+public class RookMoves extends PieceMoves{
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> possibleMoves = new ArrayList<>();

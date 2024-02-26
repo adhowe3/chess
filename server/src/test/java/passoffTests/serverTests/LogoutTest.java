@@ -32,12 +32,12 @@ public class LogoutTest {
     @Test
     public void logoutSuccess() throws DataAccessException{
 
-        Assertions.assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
+        assertNotNull(authDao.getDataFromToken(a.getAuthToken()));
 
-        LogoutRequest logoutReq = new LogoutRequest("testAuthToken");
+        LogoutRequest logoutReq = new LogoutRequest(a.getAuthToken());
         service.logout(logoutReq);
 
-        Assertions.assertNull(authDao.getDataFromUser("Allan"));
+        Assertions.assertNull(authDao.getDataFromToken(a.getAuthToken()));
         Assertions.assertEquals(u, userDao.getUser("Allan"), "user data did not match expected value");
     }
 

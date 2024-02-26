@@ -6,10 +6,10 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import responses.LoginResult;
 import service.UserService;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LoginTest {
     private AuthDAO authDao = new MemoryAuthDAO();
@@ -29,9 +29,9 @@ public class LoginTest {
         userDao.add(u);
 
         LoginRequest loginReq = new LoginRequest("Allan", "goodpassword");
-        service.login(loginReq);
+        LoginResult lrs = service.login(loginReq);
 
-        assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
+        assertNotNull(authDao.getDataFromToken(lrs.authToken()));
         Assertions.assertEquals(u, userDao.getUser("Allan"), "userdata did not match expected");
     }
 

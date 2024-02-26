@@ -27,15 +27,6 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public AuthData getDataFromUser(String username){
-        for(AuthData data : authData){
-            if(data.getUsername().equals(username))
-                return data;
-        }
-        return null;
-    }
-
-    @Override
     public AuthData getDataFromToken(String authToken){
         for(AuthData data : authData){
             if(data.getAuthToken().equals(authToken))

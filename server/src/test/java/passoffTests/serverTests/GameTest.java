@@ -64,7 +64,7 @@ public class GameTest {
         JoinGameRequest joinReq = new JoinGameRequest(au.getAuthToken(),"WHITE", 123);
         service.joinGame(joinReq);
         GameData compGm = new GameData(123, au.getUsername(), null, "SecondGame", new ChessGame());
-        Assertions.assertEquals(compGm, gameDao.getGameData("SecondGame"), "Joining the game did not match expected database");
+        Assertions.assertEquals(compGm, gameDao.getGameDataFromID(123), "Joining the game did not match expected database");
     }
 
     @Test

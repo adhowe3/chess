@@ -9,8 +9,6 @@ public interface GameDAO {
     void clearGameData();
     void add(GameData data);
 
-    GameData getGameData(String gameName);
-
     GameData getGameDataFromID(int gameID);
 
     void updateWhiteUsername(int gameID, String username);

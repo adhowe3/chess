@@ -22,15 +22,6 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData getGameData(String gameName){
-        for(GameData game : gameData){
-            if(game.getGameName().equals(gameName))
-                    return game;
-        }
-        return null;
-    }
-
-    @Override
     public GameData getGameDataFromID(int gameID){
         for(GameData game : gameData){
             if(game.getGameID() == gameID)

@@ -6,6 +6,7 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import responses.RegisterResult;
 import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,11 +25,11 @@ public class RegisterTest {
     public void registerSuccess() throws DataAccessException{
         UserService service = new UserService(userDao, authDao);
         RegisterRequest regReq = new RegisterRequest("Allan", "goodpassword", "myemail@ymail.com");
-        service.register(regReq);
+        RegisterResult resResult = service.register(regReq);
 
         UserData u = new UserData("Allan", "goodpassword", "myemail@ymail.com");
 
-        Assertions.assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
+        Assertions.assertNotNull(authDao.getDataFromToken(resResult.authToken()));
         Assertions.assertEquals(u, userDao.getUser("Allan"), "user data did not match expected userData");
 
     }

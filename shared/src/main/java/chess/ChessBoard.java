@@ -39,7 +39,6 @@ public class ChessBoard {
 
     // returns the given color king's ChessPosition, if not found, returns null
     public ChessPosition getKingPosition(ChessGame.TeamColor color){
-        ChessPiece King = new ChessPiece(color, ChessPiece.PieceType.KING);
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j++){
                 ChessPosition pos = new ChessPosition(i,j);

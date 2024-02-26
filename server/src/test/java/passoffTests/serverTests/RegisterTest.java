@@ -29,7 +29,7 @@ public class RegisterTest {
         UserData u = new UserData("Allan", "goodpassword", "myemail@ymail.com");
 
         Assertions.assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
-        Assertions.assertEquals(userDao.getUser("Allan"),  u);
+        Assertions.assertEquals(u, userDao.getUser("Allan"), "user data did not match expected userData");
 
     }
 
@@ -44,7 +44,7 @@ public class RegisterTest {
         // Use assertThrows to assert that the second registration attempt throws a DataAccessException
         DataAccessException exception = assertThrows(DataAccessException.class, () -> service.register(regReq2));
         // Assert the message of the exception
-        Assertions.assertEquals("Error: already taken", exception.getMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage(), "Thrown exception did not match expected");
     }
 
 }

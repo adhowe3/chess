@@ -38,15 +38,14 @@ public class LogoutTest {
         service.logout(logoutReq);
 
         Assertions.assertNull(authDao.getDataFromUser("Allan"));
-        Assertions.assertEquals(userDao.getUser("Allan"),  u);
-
+        Assertions.assertEquals(u, userDao.getUser("Allan"), "user data did not match expected value");
     }
 
     @Test
     public void logoutWrongAuth() throws DataAccessException{
         LogoutRequest logoutReq = new LogoutRequest("wrongAuthToken");
         DataAccessException exception = assertThrows(DataAccessException.class, () -> service.logout(logoutReq));
-        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage(), "Thrown error did not match expected error");
     }
 
 

@@ -135,7 +135,7 @@ public class ChessGame {
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j++){
                 ChessPosition currPos = new ChessPosition(i,j);
-                // if its the opposite color as the king, then add to possible moves
+                // if it is the opposite color as the king, then add to possible moves
                 if(gameBoard.getPiece(currPos) == null) continue;
                 if(gameBoard.getPiece(currPos).getTeamColor() == getOppositeColor(teamColor)){
                     possibleAttackMoves.addAll(gameBoard.getPiece(currPos).pieceMoves(gameBoard, currPos));

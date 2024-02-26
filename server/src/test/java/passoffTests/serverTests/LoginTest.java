@@ -32,7 +32,7 @@ public class LoginTest {
         service.login(loginReq);
 
         assertFalse(authDao.getDataFromUser("Allan").getAuthToken().isEmpty());
-        Assertions.assertEquals(userDao.getUser("Allan"),  u);
+        Assertions.assertEquals(u, userDao.getUser("Allan"), "userdata did not match expected");
     }
 
     @Test
@@ -45,7 +45,7 @@ public class LoginTest {
         LoginRequest loginReq = new LoginRequest("Allan", "badpassword");
 
         DataAccessException exception = assertThrows(DataAccessException.class, () -> service.login(loginReq));
-        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage(), "Thrown error did not match expected error");
     }
 
     @Test
@@ -58,7 +58,7 @@ public class LoginTest {
         LoginRequest loginReq = new LoginRequest("wrongName", "goodpassword");
 
         DataAccessException exception = assertThrows(DataAccessException.class, () -> service.login(loginReq));
-        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage(), "Thrown error did not match expected error");
     }
 
 }

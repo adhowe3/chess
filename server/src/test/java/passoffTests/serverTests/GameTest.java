@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Test;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import responses.CreateGameResponse;
+import responses.ListGamesResponse;
 import service.GameService;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -49,7 +52,7 @@ public class GameTest {
         CreateGameResponse res = service.createGame(req);
         req.setAuthorization(req.getAuthorization() + "giberish");
         DataAccessException exception = assertThrows(DataAccessException.class, () -> service.createGame(req));
-        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage(), "allowed unauthorized token to create a game");
     }
 
     @Test
@@ -61,7 +64,7 @@ public class GameTest {
         JoinGameRequest joinReq = new JoinGameRequest(au.getAuthToken(),"WHITE", 123);
         service.joinGame(joinReq);
         GameData compGm = new GameData(123, au.getUsername(), null, "SecondGame", new ChessGame());
-        Assertions.assertEquals(gameDao.getGameData("SecondGame"), compGm);
+        Assertions.assertEquals(compGm, gameDao.getGameData("SecondGame"), "Joining the game did not match expected database");
     }
 
     @Test
@@ -73,7 +76,7 @@ public class GameTest {
         JoinGameRequest joinReq = new JoinGameRequest(au.getAuthToken(), "WHITE", 123);
 
         DataAccessException exception = assertThrows(DataAccessException.class, () -> service.joinGame(joinReq));
-        Assertions.assertEquals("Error: already taken", exception.getMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage(), "Allowed user to take an already taken color");
     }
 
     @Test
@@ -82,7 +85,14 @@ public class GameTest {
         gameDao.add(g1);
         GameData g2 = new GameData(2, "vincent", "Bryce", "really not first", new ChessGame());
         gameDao.add(g2);
-        service.listGames(a.getAuthToken());
+
+        ListGamesResponse lsr = service.listGames(a.getAuthToken());
+
+        ArrayList<GameData> compareList = new ArrayList<>();
+        compareList.add(g);
+        compareList.add(g1);
+        compareList.add(g2);
+        Assertions.assertEquals(compareList, lsr.games(), "list did not match expected response");
     }
 
     @Test
@@ -92,7 +102,7 @@ public class GameTest {
         GameData g2 = new GameData(2, "vincent", "Bryce", "really not first", new ChessGame());
         gameDao.add(g2);
         DataAccessException ex = Assertions.assertThrows(DataAccessException.class, () -> service.listGames(a.getAuthToken() + "bad auth"));
-        Assertions.assertEquals("Error: unauthorized", ex.getMessage());
+        Assertions.assertEquals("Error: unauthorized", ex.getMessage(), "expected a DataAccessException throw");
     }
 
 }

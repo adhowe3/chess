@@ -33,62 +33,17 @@ public class PawnMoves extends PieceMoves{
             }
 
             ChessPosition endPos1 = new ChessPosition(newRow, col);
-            if(NULL_SPOT == this.isValidMove(myPosition, endPos1, board)){
-                if(canPromote){
-                    ChessMove move1 = new ChessMove(myPosition, endPos1, promoQueen);
-                    possibleMoves.add(move1);
-                    ChessMove move2 = new ChessMove(myPosition, endPos1, promoRook);
-                    possibleMoves.add(move2);
-                    ChessMove move3 = new ChessMove(myPosition, endPos1, promoBishop);
-                    possibleMoves.add(move3);
-                    ChessMove move4 = new ChessMove(myPosition, endPos1, promoKnight);
-                    possibleMoves.add(move4);
-                }
-                else{
-                    ChessMove move = new ChessMove(myPosition, endPos1);
-                    possibleMoves.add(move);
-                }
-            }
+        addPromotions(board, myPosition, possibleMoves, canPromote, promoQueen, promoRook, promoKnight, promoBishop, endPos1, NULL_SPOT);
 
-            //check attack
+        //check attack
             ChessPosition endPos2 = new ChessPosition(newRow, col+1);
-            if(OPPOSITE_COLOR_SPOT == this.isValidMove(myPosition, endPos2, board)){
-                if(canPromote){
-                    ChessMove move1 = new ChessMove(myPosition, endPos2, promoQueen);
-                    possibleMoves.add(move1);
-                    ChessMove move2 = new ChessMove(myPosition, endPos2, promoRook);
-                    possibleMoves.add(move2);
-                    ChessMove move3 = new ChessMove(myPosition, endPos2, promoBishop);
-                    possibleMoves.add(move3);
-                    ChessMove move4 = new ChessMove(myPosition, endPos2, promoKnight);
-                    possibleMoves.add(move4);
-                }
-                else{
-                    ChessMove move = new ChessMove(myPosition, endPos2);
-                    possibleMoves.add(move);
-                }
-            }
+        addPromotions(board, myPosition, possibleMoves, canPromote, promoQueen, promoRook, promoKnight, promoBishop, endPos2, OPPOSITE_COLOR_SPOT);
 
-            //check attack 2
+        //check attack 2
             ChessPosition endPos3 = new ChessPosition(newRow, col-1);
-            if(OPPOSITE_COLOR_SPOT == this.isValidMove(myPosition, endPos3, board)){
-                if(canPromote){
-                    ChessMove move1 = new ChessMove(myPosition, endPos3, promoQueen);
-                    possibleMoves.add(move1);
-                    ChessMove move2 = new ChessMove(myPosition, endPos3, promoRook);
-                    possibleMoves.add(move2);
-                    ChessMove move3 = new ChessMove(myPosition, endPos3, promoBishop);
-                    possibleMoves.add(move3);
-                    ChessMove move4 = new ChessMove(myPosition, endPos3, promoKnight);
-                    possibleMoves.add(move4);
-                }
-                else{
-                    ChessMove move = new ChessMove(myPosition, endPos3);
-                    possibleMoves.add(move);
-                }
-            }
+        addPromotions(board, myPosition, possibleMoves, canPromote, promoQueen, promoRook, promoKnight, promoBishop, endPos3, OPPOSITE_COLOR_SPOT);
 
-            // check first move, is 2 spaces, row 2 is starting for white pawns
+        // check first move, is 2 spaces, row 2 is starting for white pawns
             if(myPosition.getRow() == startRow) {
                 ChessPosition endPos4 = new ChessPosition(doubleNewRow, col);
                 if (NULL_SPOT == this.isValidMove(myPosition, endPos4, board) &&
@@ -98,6 +53,25 @@ public class PawnMoves extends PieceMoves{
                 }
             }
             return possibleMoves;
+    }
+
+    private void addPromotions(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves, boolean canPromote, ChessPiece.PieceType promoQueen, ChessPiece.PieceType promoRook, ChessPiece.PieceType promoKnight, ChessPiece.PieceType promoBishop, ChessPosition endPos1, int nullSpot) {
+        if(nullSpot == this.isValidMove(myPosition, endPos1, board)){
+            if(canPromote){
+                ChessMove move1 = new ChessMove(myPosition, endPos1, promoQueen);
+                possibleMoves.add(move1);
+                ChessMove move2 = new ChessMove(myPosition, endPos1, promoRook);
+                possibleMoves.add(move2);
+                ChessMove move3 = new ChessMove(myPosition, endPos1, promoBishop);
+                possibleMoves.add(move3);
+                ChessMove move4 = new ChessMove(myPosition, endPos1, promoKnight);
+                possibleMoves.add(move4);
+            }
+            else{
+                ChessMove move = new ChessMove(myPosition, endPos1);
+                possibleMoves.add(move);
+            }
+        }
     }
 
     //END CLASS

@@ -29,7 +29,7 @@ public class GameTest {
 
 
     @BeforeEach
-    public void setup(){
+    public void setup() throws Exception{
         gameDao = new MemoryGameDAO();
         authDao = new MemoryAuthDAO();
         req = new CreateGameRequest("testAuthToken", "gameName");

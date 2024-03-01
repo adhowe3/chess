@@ -20,7 +20,7 @@ public class ClearTest {
     private UserDAO userDao = new MemoryUserDAO();
 
     @BeforeEach
-    public void setDb(){
+    public void setDb() throws Exception{
         gameDao = new MemoryGameDAO();
         authDao = new MemoryAuthDAO();
         userDao = new MemoryUserDAO();

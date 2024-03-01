@@ -16,7 +16,7 @@ public class LoginTest {
     private UserDAO userDao = new MemoryUserDAO();
 
     @BeforeEach
-    public void setDaos(){
+    public void setDaos() throws Exception{
         authDao = new MemoryAuthDAO();
         userDao = new MemoryUserDAO();
     }

@@ -19,7 +19,7 @@ public class LogoutTest {
     UserService service;
 
     @BeforeEach
-    public void setDaos(){
+    public void setDaos() throws Exception{
         authDao = new MemoryAuthDAO();
         userDao = new MemoryUserDAO();
         u = new UserData("Allan", "goodpassword", "myemail@ymail.com");

@@ -15,7 +15,7 @@ public class DatabaseManager {
     static {
         try {
             try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
-                if (propStream == null) throw new Exception("Unable to laod db.properties");
+                if (propStream == null) throw new Exception("Unable to load db.properties");
                 Properties props = new Properties();
                 props.load(propStream);
                 databaseName = props.getProperty("db.name");
@@ -34,7 +34,7 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-    static void createDatabase() throws DataAccessException {
+    public static void createDatabase() throws DataAccessException {
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -45,6 +45,56 @@ public class DatabaseManager {
             throw new DataAccessException(e.getMessage());
         }
     }
+
+    private static final String[] createStatements = {
+            """
+    CREATE TABLE IF NOT EXISTS authTable (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `username` VARCHAR(256) NOT NULL,
+      `authToken` VARCHAR(256) NOT NULL,
+      PRIMARY KEY (`id`),
+      INDEX idx_username (`username`),
+      INDEX idx_authToken (`authToken`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """,
+            """
+    CREATE TABLE IF NOT EXISTS userTable (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `username` VARCHAR(256) NOT NULL,
+      `password` VARCHAR(256) NOT NULL,
+      `email` VARCHAR(256) NOT NULL,
+      PRIMARY KEY (`id`),
+      INDEX idx_username (`username`),
+      INDEX idx_email (`email`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """,
+            """
+    CREATE TABLE IF NOT EXISTS gameTable (
+      `gameID` INT NOT NULL AUTO_INCREMENT,
+      `whiteUsername` VARCHAR(256),
+      `blackUsername` VARCHAR(256),
+      `gameName` VARCHAR(256) NOT NULL,
+      `game` TEXT NOT NULL,
+      PRIMARY KEY (`gameID`),
+      INDEX idx_whiteUsername (`whiteUsername`),
+      INDEX idx_blackUsername (`blackUsername`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """
+    };
+
+    static void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+        }
+    }
+
 
     /**
      * Create a connection to the database and sets the catalog based upon the
@@ -58,7 +108,7 @@ public class DatabaseManager {
      * }
      * </code>
      */
-    static Connection getConnection() throws DataAccessException {
+    public static Connection getConnection() throws DataAccessException {
         try {
             var conn = DriverManager.getConnection(connectionUrl, user, password);
             conn.setCatalog(databaseName);

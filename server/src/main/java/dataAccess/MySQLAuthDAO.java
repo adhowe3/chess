@@ -26,6 +26,9 @@ public class MySQLAuthDAO implements AuthDAO{
     }
 
     public void add(AuthData data) throws DataAccessException {
+        if(getDataFromToken(data.getAuthToken()) != null){
+            throw new DataAccessException("Error: authToken taken");
+        }
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "INSERT INTO authTable (username, authToken) VALUES (?, ?)"
@@ -50,11 +53,11 @@ public class MySQLAuthDAO implements AuthDAO{
                     String retrievedUsername = resultSet.getString("username");
                     return new AuthData(retrievedAuthToken, retrievedUsername);
                 }
+                else return null;
             }
         } catch(SQLException e){
             throw new DataAccessException("Error: Failed to get AuthData from database" + e.getMessage());
         }
-        return null;
     }
 
     public boolean delete(String authToken) throws DataAccessException{
@@ -71,9 +74,23 @@ public class MySQLAuthDAO implements AuthDAO{
         }
     }
 
-    public ArrayList<AuthData> getAll(){
+    public ArrayList<AuthData> getAll() throws DataAccessException{
         ArrayList<AuthData> authDataArrayList = new ArrayList<>();
-
+        try(Connection connection = DatabaseManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT username, authToken FROM authTable"
+            )){
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while(resultSet.next()) {
+                    String retrievedAuthToken = resultSet.getString("authToken");
+                    String retrievedUsername = resultSet.getString("username");
+                    authDataArrayList.add(new AuthData(retrievedAuthToken, retrievedUsername));
+                }
+            }
+        } catch(SQLException e){
+            throw new DataAccessException("Error: Failed to get all AuthData from database" + e.getMessage());
+        }
         return authDataArrayList;
     }
+
 }

@@ -60,6 +60,11 @@ public class SQLAuthDaoTests {
     }
 
     @Test
+    public void testClear() throws DataAccessException{
+
+    }
+
+    @Test
     @Order(2)
     public void testAdd() throws DataAccessException {
         // Create an instance of AuthData with sample data

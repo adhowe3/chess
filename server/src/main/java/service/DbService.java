@@ -12,7 +12,7 @@ public class DbService {
         this.gameDao = gameDao;
         this.userDao = userDao;
     }
-    public void clear(){
+    public void clear() throws DataAccessException{
         authDao.clearAuthData();
         gameDao.clearGameData();
         userDao.clearUserData();

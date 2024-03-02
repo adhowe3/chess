@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface AuthDAO {
-    void clearAuthData();
+    void clearAuthData() throws DataAccessException;
     void add(AuthData data) throws DataAccessException;
-    AuthData getDataFromToken(String authToken);
-    boolean delete(String authToken);
+    AuthData getDataFromToken(String authToken) throws DataAccessException;
+    boolean delete(String authToken) throws DataAccessException;
     ArrayList<AuthData> getAll();
 
 }

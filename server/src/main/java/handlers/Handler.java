@@ -15,6 +15,8 @@ import spark.Request;
 import service.DbService;
 import dataAccess.*;
 
+import javax.xml.crypto.Data;
+
 public class Handler {
     private GameDAO gameDao = new MemoryGameDAO();
     private AuthDAO authDao = new MemoryAuthDAO();
@@ -24,7 +26,13 @@ public class Handler {
 
     public Object clear(Request req, Response res){
         DbService service = new DbService(authDao, gameDao, userDao);
-        service.clear();
+        try{
+            service.clear();
+        }
+        catch(DataAccessException e){
+            setResponse(e, res);
+            return res.body();
+        }
         return "{}";
     }
 

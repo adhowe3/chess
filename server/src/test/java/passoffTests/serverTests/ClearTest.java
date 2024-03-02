@@ -34,7 +34,7 @@ public class ClearTest {
     }
 
     @Test
-    public void clearSuccess(){
+    public void clearSuccess() throws DataAccessException{
         assertFalse(authDao.getAll().isEmpty());
         assertFalse(gameDao.getAll().isEmpty());
         assertFalse(userDao.getAll().isEmpty());

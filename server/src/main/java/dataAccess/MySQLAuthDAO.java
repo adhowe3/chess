@@ -4,6 +4,7 @@ import model.AuthData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -13,8 +14,15 @@ public class MySQLAuthDAO implements AuthDAO{
         DatabaseManager.configureDatabase();
     }
 
-    public void clearAuthData(){
-
+    public void clearAuthData() throws DataAccessException{
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "TRUNCATE TABLE authTable"
+             )) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: Failed to clear AuthData in database - " + e.getMessage());
+        }
     }
 
     public void add(AuthData data) throws DataAccessException {
@@ -30,15 +38,39 @@ public class MySQLAuthDAO implements AuthDAO{
             throw new DataAccessException("Error: Failed to add AuthData to database - " + e.getMessage());
         }
     }
-    public AuthData getDataFromToken(String authToken){
-        AuthData data = new AuthData(authToken,"temp");
-
-        return data;
+    public AuthData getDataFromToken(String authToken) throws DataAccessException{
+        try(Connection connection = DatabaseManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT username, authToken FROM authTable WHERE authToken = ?"
+            )){
+            preparedStatement.setString(1, authToken);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String retrievedAuthToken = resultSet.getString("authToken");
+                    String retrievedUsername = resultSet.getString("username");
+                    return new AuthData(retrievedAuthToken, retrievedUsername);
+                }
+            }
+        } catch(SQLException e){
+            throw new DataAccessException("Error: Failed to get AuthData from database" + e.getMessage());
+        }
+        return null;
     }
 
-    public boolean delete(String authToken){
-        return true;
+    public boolean delete(String authToken) throws DataAccessException{
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "DELETE FROM authTable WHERE authToken = ?"
+             )) {
+            preparedStatement.setString(1, authToken);
+            int rowsAffected = preparedStatement.executeUpdate();
+            // Check if any rows were deleted
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: Failed to delete AuthData from database - " + e.getMessage());
+        }
     }
+
     public ArrayList<AuthData> getAll(){
         ArrayList<AuthData> authDataArrayList = new ArrayList<>();
 

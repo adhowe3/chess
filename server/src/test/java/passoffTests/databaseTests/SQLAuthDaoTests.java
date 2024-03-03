@@ -61,7 +61,24 @@ public class SQLAuthDaoTests {
 
     @Test
     public void testClear() throws DataAccessException{
+        authDao.add(new AuthData("fakeAuthToken", "fakeUser"));
+        authDao.clearAuthData();
 
+        // Verify that the user data is cleared by checking if there are any records left in the userTable
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM authTable");
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            // Get the count of records in the userTable
+            int count = 0;
+            while(resultSet.next()) {
+                count++;
+            }
+
+            Assertions.assertEquals(0, count, "Authdata should be cleared");
+        } catch (SQLException e) {
+            Assertions.fail("Failed to execute SQL query: " + e.getMessage());
+        }
     }
 
     @Test

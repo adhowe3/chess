@@ -164,7 +164,4 @@ public class SQLUserDaoTests {
         }
     }
 
-
-
-
 } // END CLASS

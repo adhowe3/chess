@@ -6,17 +6,11 @@ import model.GameData;
 import java.util.ArrayList;
 
 public interface GameDAO {
-    void clearGameData();
-    void add(GameData data);
-
-    GameData getGameDataFromID(int gameID);
-
-    void updateWhiteUsername(int gameID, String username);
-
-    void updateBlackUsername(int gameID, String username);
-
-    int nextGameID();
-
+    void clearGameData() throws DataAccessException;
+    void add(GameData data) throws DataAccessException;
+    GameData getGameDataFromID(int gameID) throws DataAccessException;
+    void updateWhiteUsername(int gameID, String username) throws DataAccessException;
+    void updateBlackUsername(int gameID, String username) throws DataAccessException;
+//    int nextGameID();
     ArrayList<GameData> getAll();
-
 }

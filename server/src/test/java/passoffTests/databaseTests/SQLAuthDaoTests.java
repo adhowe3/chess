@@ -130,9 +130,7 @@ public class SQLAuthDaoTests {
     @Test
     @Order(4)
     public void testGetDataFromToken() throws DataAccessException {
-        // Call the method to retrieve AuthData for the sampleAuthToken
         AuthData retrievedData = authDao.getDataFromToken(sampleAuthToken);
-        // Verify that the retrieved data matches the expected data
         Assertions.assertNotNull(retrievedData); // Ensure that retrievedData is not null
         Assertions.assertEquals(sampleAuthToken, retrievedData.getAuthToken());
         Assertions.assertEquals(sampleUserName, retrievedData.getUsername());
@@ -141,22 +139,15 @@ public class SQLAuthDaoTests {
     @Test
     @Order(5)
     public void testGetDataFromTokenNegative() throws DataAccessException {
-        // Call the method to retrieve AuthData for the sampleAuthToken
         AuthData retrievedData = authDao.getDataFromToken("tokenNotInDatabase");
-        // Verify that the retrieved data matches the expected data
         Assertions.assertNull(retrievedData, "retrievedData should have been null"); // Ensure that retrievedData is null
     }
 
     @Test
     @Order(6)
     public void testDelete() throws DataAccessException {
-        // Call the delete method to delete the sampleAuthToken
         boolean deletionResult = authDao.delete(sampleAuthToken);
-
-        // Verify that deletion was successful
         Assertions.assertTrue(deletionResult, "Deletion should be successful");
-
-        // Verify that the authToken no longer exists in the database
         AuthData retrievedData = authDao.getDataFromToken(sampleAuthToken);
         Assertions.assertNull(retrievedData, "AuthData should be null after deletion");
     }
@@ -168,7 +159,6 @@ public class SQLAuthDaoTests {
         Assertions.assertFalse(deletionResult, "Deletion should be unsuccessful");
     }
 
-    // Positive case: Testing successful retrieval of all data
     @Test
     @Order(8)
     public void testGetAllPositive() throws DataAccessException {
@@ -203,11 +193,9 @@ public class SQLAuthDaoTests {
         }
     }
 
-    // Method to drop the authTable (or delete the entire database)
     private void dropAuthTable() throws SQLException, DataAccessException {
         try (Connection connection = DatabaseManager.getConnection();
              Statement statement = connection.createStatement()) {
-            // Execute SQL command to drop the table or delete the database
             statement.executeUpdate("DROP TABLE IF EXISTS authTable");
         }
         catch(SQLException e){

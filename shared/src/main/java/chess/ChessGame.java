@@ -221,7 +221,7 @@ public class ChessGame {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessGame chessGame = (ChessGame) o;
-        return Objects.equals(gameBoard, chessGame.gameBoard) && currTeamTurn == chessGame.currTeamTurn;
+        return Objects.deepEquals(gameBoard, chessGame.gameBoard) && currTeamTurn == chessGame.currTeamTurn;
     }
 
     @Override
@@ -229,4 +229,11 @@ public class ChessGame {
         return Objects.hash(gameBoard, currTeamTurn);
     }
 
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "gameBoard=" + gameBoard +
+                ", currTeamTurn=" + currTeamTurn +
+                '}';
+    }
 }

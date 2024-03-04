@@ -42,6 +42,10 @@ public class GameData {
         this.blackUsername = blackUsername;
     }
 
+    public ChessGame getGame(){
+        return game;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

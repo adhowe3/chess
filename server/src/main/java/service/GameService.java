@@ -27,7 +27,6 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
         }
         String username = authDao.getDataFromToken(gameReq.getAuthorization()).getUsername();
-        int newGameId = gameDao.nextGameID();
         GameData game = new GameData(newGameId, null, null, gameReq.getGameName(), new ChessGame());
         gameDao.add(game);
         return new CreateGameResponse(newGameId);

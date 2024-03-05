@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -65,7 +66,9 @@ public class SQLUserDaoTests {
         // Verify that the retrieved user is not null and has the correct attributes
         assertNotNull(retrievedUser, "Retrieved user should not be null");
         assertEquals("testUser", retrievedUser.getUsername(), "Username should match");
-        assertEquals("testPassword", retrievedUser.getPassword(), "Password should match");
+        var hashedPassword = retrievedUser.getPassword();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        assertTrue(encoder.matches("testPassword", hashedPassword), "hashed passwords should match");
         assertEquals("test@example.com", retrievedUser.getEmail(), "Email should match");
     }
 
@@ -97,7 +100,9 @@ public class SQLUserDaoTests {
                 // Verify that the user data exists in the database and matches the original data
                 assertTrue(resultSet.next(), "User data should exist in the database");
                 assertEquals("testUser", resultSet.getString("username"), "Username should match");
-                assertEquals("testPassword", resultSet.getString("password"), "Password should match");
+                var hashedPassword = resultSet.getString("password");
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                assertTrue(encoder.matches("testPassword", hashedPassword), "hashed passwords should match");
                 assertEquals("test@example.com", resultSet.getString("email"), "Email should match");
             }
         } catch (SQLException e) {
@@ -129,10 +134,14 @@ public class SQLUserDaoTests {
         // Verify the details of each retrieved user
         for (UserData userData : allUserData) {
             if (userData.getUsername().equals("user1")) {
-                assertEquals("password1", userData.getPassword(), "Password for user1 should match");
+                var hashedPassword1 = userData.getPassword();
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                assertTrue(encoder.matches("password1", hashedPassword1), "hashed passwords should match");
                 assertEquals("user1@example.com", userData.getEmail(), "Email for user1 should match");
             } else if (userData.getUsername().equals("user2")) {
-                assertEquals("password2", userData.getPassword(), "Password for user2 should match");
+                var hashedPassword2 = userData.getPassword();
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                assertTrue(encoder.matches("password2", hashedPassword2), "hashed passwords should match");
                 assertEquals("user2@example.com", userData.getEmail(), "Email for user2 should match");
             } else {
                 fail("Unexpected username retrieved: " + userData.getUsername());

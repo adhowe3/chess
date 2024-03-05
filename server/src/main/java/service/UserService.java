@@ -3,6 +3,7 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
@@ -44,7 +45,7 @@ public class UserService {
         if(userDao.getUser(loginReq.username()) == null){
             throw new DataAccessException("Error: unauthorized");
         }
-        if(!userDao.getUser(loginReq.username()).getPassword().equals(loginReq.password())){
+        if(!verifyUser(loginReq.username(), loginReq.password())){
             throw new DataAccessException("Error: unauthorized");
         }
         String authToken = UUID.randomUUID().toString();
@@ -59,6 +60,13 @@ public class UserService {
         if(!authDao.delete(logoutReq.authorization())){
             throw new DataAccessException("Error: unauthorized");
         }
+    }
+
+    boolean verifyUser(String username, String providedClearTextPassword) throws DataAccessException {
+        // read the previously hashed password from the database
+        var hashedPassword = userDao.getUser(username).getPassword();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.matches(providedClearTextPassword, hashedPassword);
     }
 
 }

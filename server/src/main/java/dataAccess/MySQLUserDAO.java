@@ -2,6 +2,7 @@ package dataAccess;
 
 import model.AuthData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -56,7 +57,7 @@ public class MySQLUserDAO implements UserDAO{
                      "INSERT INTO userTable (username,password,email) VALUES (?, ?, ?)"
              )) {
             preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setString(2, getHashedPassword(user.getPassword()));
             preparedStatement.setString(3, user.getEmail());
 
             preparedStatement.executeUpdate();
@@ -85,6 +86,13 @@ public class MySQLUserDAO implements UserDAO{
         }
         return userDataArrayList;
     }
+
+    String getHashedPassword(String textPassword) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(textPassword);
+    }
+
+
 
 
 

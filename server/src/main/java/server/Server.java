@@ -1,6 +1,4 @@
 package server;
-import dataAccess.DataAccessException;
-import service.GameService;
 import handlers.Handler;
 import spark.*;
 

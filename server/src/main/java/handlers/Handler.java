@@ -1,7 +1,6 @@
 package handlers;
 import com.google.gson.Gson;
 import dataAccess.GameDAO;
-import dataAccess.MemoryGameDAO;
 import model.*;
 import requests.*;
 import responses.CreateGameResponse;
@@ -14,10 +13,6 @@ import spark.Response;
 import spark.Request;
 import service.DbService;
 import dataAccess.*;
-
-import javax.xml.crypto.Data;
-import java.sql.SQLData;
-import java.sql.SQLException;
 
 public class Handler {
     private GameDAO gameDao;

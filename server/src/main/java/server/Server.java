@@ -1,4 +1,5 @@
 package server;
+import dataAccess.DataAccessException;
 import service.GameService;
 import handlers.Handler;
 import spark.*;
@@ -6,7 +7,7 @@ import spark.*;
 
 public class Server {
     private Handler handler;
-    public Server(){
+    public Server() {
         handler = new Handler();
     }
 

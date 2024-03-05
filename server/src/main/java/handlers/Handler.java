@@ -16,13 +16,24 @@ import service.DbService;
 import dataAccess.*;
 
 import javax.xml.crypto.Data;
+import java.sql.SQLData;
+import java.sql.SQLException;
 
 public class Handler {
-    private GameDAO gameDao = new MemoryGameDAO();
-    private AuthDAO authDao = new MemoryAuthDAO();
-    private UserDAO userDao = new MemoryUserDAO();
+    private GameDAO gameDao;
+    private AuthDAO authDao;
+    private UserDAO userDao;
     Gson serializer = new Gson();
-    public Handler(){}
+    public Handler() {
+        try{
+            gameDao = new MySQLGameDAO();
+            authDao = new MySQLAuthDAO();
+            userDao = new MySQLUserDAO();
+        }
+        catch(DataAccessException e){
+            System.out.println("Failed to initialize the database");
+        }
+    }
 
     public Object clear(Request req, Response res){
         DbService service = new DbService(authDao, gameDao, userDao);

@@ -1,4 +1,4 @@
-package passoffTests.dataAccessTests;
+package dataAccessTests;
 
 import chess.*;
 import com.google.gson.Gson;

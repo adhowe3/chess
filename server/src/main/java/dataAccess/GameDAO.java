@@ -11,6 +11,6 @@ public interface GameDAO {
     GameData getGameDataFromID(int gameID) throws DataAccessException;
     void updateWhiteUsername(int gameID, String username) throws DataAccessException;
     void updateBlackUsername(int gameID, String username) throws DataAccessException;
-//    int nextGameID();
-    ArrayList<GameData> getAll();
+    int nextGameID() throws  DataAccessException;
+    ArrayList<GameData> getAll() throws  DataAccessException;
 }

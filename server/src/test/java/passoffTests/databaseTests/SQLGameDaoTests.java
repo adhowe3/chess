@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -194,7 +195,10 @@ public class SQLGameDaoTests {
     }
 
     @Test
-    public void testUpdateWhiteUsernameNegative() {
+    public void testUpdateWhiteUsernameNegative() throws DataAccessException {
+        // Insert a test game data into the database
+        GameData testData = new GameData(1, "white", null, "gameName", new ChessGame());
+        gameDao.add(testData);
         // Attempt to update whiteUsername for an incorrect gameID
         int incorrectGameID = -1; // assuming this gameID does not exist
         String newWhiteUsername = "newWhiteUser";
@@ -205,6 +209,114 @@ public class SQLGameDaoTests {
                 "Method should throw DataAccessException for incorrect gameID");
         assertEquals("Error: bad request", exception.getMessage(), "Exception message should match");
     }
+
+    @Test
+    public void testUpdateBlackUsername() throws DataAccessException {
+        // Insert a test game data into the database
+        GameData testData = new GameData(1, null, null, "gameName", new ChessGame());
+        gameDao.add(testData);
+
+        // Update blackUsername for the inserted game
+        String newBlackUsername = "newBlackUser";
+        gameDao.updateBlackUsername(1, newBlackUsername);
+
+        // Retrieve the updated game data
+        GameData updatedData = gameDao.getGameDataFromID(1);
+
+        // Verify that the blackUsername has been updated
+        assertNotNull(updatedData, "Retrieved game data should not be null");
+        assertEquals(newBlackUsername, updatedData.getBlackUsername(), "Black username should match the updated value");
+    }
+
+    @Test
+    public void testUpdateBlackUsernameNegative() throws DataAccessException {
+        // Insert a test game data into the database
+        GameData testData = new GameData(1, null, "black", "gameName", new ChessGame());
+        gameDao.add(testData);
+        // Attempt to update blackUsername for an incorrect gameID
+        int incorrectGameID = -1; // assuming this gameID does not exist
+        String newBlackUsername = "newBlackUsername";
+
+        // Verify that attempting to update the blackUsername throws the correct exception
+        DataAccessException exception = assertThrows(DataAccessException.class,
+                () -> gameDao.updateBlackUsername(incorrectGameID, newBlackUsername),
+                "Method should throw DataAccessException for incorrect gameID");
+        assertEquals("Error: bad request", exception.getMessage(), "Exception message should match");
+    }
+
+    @Test
+    public void testNextGameID() throws DataAccessException {
+        // Insert some test data to create gaps in the gameID sequence
+        gameDao.add(new GameData(gameDao.nextGameID(), "WhitePlayer1", "BlackPlayer1", "Game1", new ChessGame())); // gameID: 1
+        gameDao.add(new GameData(gameDao.nextGameID(), "WhitePlayer2", "BlackPlayer2", "Game2", new ChessGame())); // gameID: 2
+        deleteGame(1); // Delete the first game, leaving a gap
+
+        assertEquals(2, gameDao.nextGameID(), "Next gameID should auto increment");
+
+        gameDao.add(new GameData(gameDao.nextGameID(), "WhitePlayer2", "BlackPlayer2", "Game2", new ChessGame())); // gameID: 2
+        assertEquals(3, gameDao.nextGameID(), "Next gameID should be the smallest available unused ID");
+    }
+
+    @Test
+    public void testNextGameIDNegative() throws DataAccessException {
+        // Insert some test data to create gaps in the gameID sequence
+        gameDao.add(new GameData(gameDao.nextGameID(), "WhitePlayer1", "BlackPlayer1", "Game1", new ChessGame())); // gameID: 1
+        gameDao.add(new GameData(gameDao.nextGameID(), "WhitePlayer2", "BlackPlayer2", "Game2", new ChessGame())); // gameID: 2
+        deleteGame(1); // Delete the first game, leaving a gap
+
+        dropGameTable();
+
+        DataAccessException exception = assertThrows(DataAccessException.class,
+                () -> gameDao.nextGameID(),
+                "Method should throw SQL error");
+    }
+
+    public void deleteGame(int gameID) throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "DELETE FROM gameTable WHERE gameID = ?"
+             )) {
+            preparedStatement.setInt(1, gameID);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: Failed to delete game from database - " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetAll() throws DataAccessException, InvalidMoveException {
+        // Add some test data to the database
+        ChessGame game1 = new ChessGame();
+        ChessGame game2 = new ChessGame();
+        game2.makeMove(new ChessMove(new ChessPosition(2,1), new ChessPosition(4,1)));
+        game2.makeMove(new ChessMove(new ChessPosition(7,5), new ChessPosition(5,5)));
+        gameDao.add(new GameData(1, "WhitePlayer1", "BlackPlayer1", "Game1", game1));
+        gameDao.add(new GameData(2, "WhitePlayer2", "BlackPlayer2", "Game2", game2));
+
+        // Retrieve all game data from the database
+        ArrayList<GameData> allGameData = gameDao.getAll();
+
+        // Verify that the size of the returned list matches the number of games added
+        assertEquals(2, allGameData.size(), "Number of retrieved game data should match the number of games added");
+
+        assertNotNull(allGameData.get(0)); // Ensure each game data object is not null
+        assertEquals(allGameData.get(0).getGameID(), 1, "gameID 1 should match");
+        assertEquals(allGameData.get(0).getGame(), game1, "game 1 should match");
+        assertEquals(allGameData.get(1).getGame(), game2, "game 2 should match");
+    }
+
+    @Test
+    public void testGetAllNegative() throws DataAccessException{
+        // Add some test data to the database
+        ChessGame game1 = new ChessGame();
+        gameDao.add(new GameData(1, "WhitePlayer1", "BlackPlayer1", "Game1", game1));
+
+        //simulate a non existent SQL db
+        dropGameTable();
+
+        assertThrows(DataAccessException.class, () -> gameDao.getAll(),"Method should throw SQL error");
+    }
+
 
 
 

@@ -82,7 +82,7 @@ public class MySQLGameDAO implements GameDAO{
                 throw new DataAccessException("Error: bad request");
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to update whiteUsername for gameID " + gameID + ": " + e.getMessage());
+            throw new DataAccessException("Error: Failed to update whiteUsername for gameID " + gameID + ": " + e.getMessage());
         }
     }
     @Override
@@ -98,16 +98,49 @@ public class MySQLGameDAO implements GameDAO{
                 throw new DataAccessException("Error: bad request");
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to update blackUsername for gameID " + gameID + ": " + e.getMessage());
+            throw new DataAccessException("Error: Failed to update blackUsername for gameID " + gameID + ": " + e.getMessage());
         }
     }
-//    @Override
-//    public int nextGameID(){
-//        return 0;
-//    }
     @Override
-    public ArrayList<GameData> getAll(){
-        return new ArrayList<>();
+    public int nextGameID() throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT COUNT(*) AS total FROM gameTable"
+             )) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int totalRows = resultSet.getInt("total");
+                    return totalRows + 1;
+                } else {
+                    return 1;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: Failed to get nextGameID: " + e.getMessage());
+        }
+    }
+    @Override
+    public ArrayList<GameData> getAll() throws DataAccessException{
+        ArrayList<GameData> gameData = new ArrayList<>();
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM gameTable"
+             )) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int retrievedGameID = resultSet.getInt("gameID");
+                    String retrievedBlackUser = resultSet.getString("blackUsername");
+                    String retrievedWhiteUser = resultSet.getString("whiteUsername");
+                    String retrievedGameName = resultSet.getString("gameName");
+                    String retrievedGameJson = resultSet.getString("game");
+                    ChessGame chessGame = new Gson().fromJson(retrievedGameJson, ChessGame.class);
+                    gameData.add(new GameData(retrievedGameID, retrievedWhiteUser, retrievedBlackUser, retrievedGameName, chessGame));
+                }
+                return gameData;
+            }
+        }catch (SQLException e) {
+            throw new DataAccessException("Error: cannot get gameData from gameID - " + e.getMessage());
+        }
     }
 
 

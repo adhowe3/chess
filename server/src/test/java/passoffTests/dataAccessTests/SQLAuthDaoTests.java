@@ -1,4 +1,4 @@
-package passoffTests.databaseTests;
+package passoffTests.dataAccessTests;
 
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
@@ -7,7 +7,6 @@ import dataAccess.MySQLAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;

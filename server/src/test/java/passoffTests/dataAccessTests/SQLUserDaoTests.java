@@ -1,13 +1,11 @@
-package passoffTests.databaseTests;
+package passoffTests.dataAccessTests;
 
 import dataAccess.*;
-import model.AuthData;
 import model.UserData;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;

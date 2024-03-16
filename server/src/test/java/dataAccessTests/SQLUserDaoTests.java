@@ -33,6 +33,7 @@ public class SQLUserDaoTests {
         userDao = new MySQLUserDAO();
         userDao.clearUserData();
         userDao.add(u);
+
     }
 
     @Test

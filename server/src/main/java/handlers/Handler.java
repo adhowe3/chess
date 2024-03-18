@@ -21,9 +21,9 @@ public class Handler {
     Gson serializer = new Gson();
     public Handler() {
         try{
-            gameDao = new MySQLGameDAO();
-            authDao = new MySQLAuthDAO();
-            userDao = new MySQLUserDAO();
+            this.gameDao = new MySQLGameDAO();
+            this.authDao = new MySQLAuthDAO();
+            this.userDao = new MySQLUserDAO();
         }
         catch(DataAccessException e){
             System.out.println("Failed to initialize the database");

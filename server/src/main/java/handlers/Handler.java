@@ -72,7 +72,6 @@ public class Handler {
     public Object logout(Request req, Response res){
         UserService service = new UserService(userDao, authDao);
         LogoutRequest objReq = new LogoutRequest(req.headers("authorization"));
-
         try{
             service.logout(objReq);
         }

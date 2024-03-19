@@ -3,6 +3,8 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.*;
+import requests.LoginRequest;
+import requests.LogoutRequest;
 
 import java.io.*;
 import java.net.*;
@@ -17,17 +19,17 @@ public class ServerFacade {
 
     public AuthData registerUser(UserData user) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, user, AuthData.class);
+        return this.makeRequest("POST", path, user, null, AuthData.class);
     }
 
-    public void deletePet(int id) throws ResponseException {
-        var path = String.format("/pet/%s", id);
-        this.makeRequest("DELETE", path, null, null);
+    public AuthData loginUser(LoginRequest login) throws ResponseException {
+        var path = "/session";
+        return this.makeRequest("POST", path, login, null, AuthData.class);
     }
 
-    public void deleteAllPets() throws ResponseException {
-        var path = "/pet";
-        this.makeRequest("DELETE", path, null, null);
+    public void logoutUser(String auth) throws ResponseException {
+        var path = "/session";
+        this.makeRequest("DELETE", path, null, auth, null);
     }
 
 //    public Pet[] listPets() throws ResponseException {
@@ -38,12 +40,17 @@ public class ServerFacade {
 //        return response.pet();
 //    }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, String authorizationHeader, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            // Set headers
+            if (authorizationHeader != null) {
+                http.setRequestProperty("authorization", authorizationHeader);
+            }
 
             writeBody(request, http);
             http.connect();

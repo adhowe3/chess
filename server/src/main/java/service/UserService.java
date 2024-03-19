@@ -55,9 +55,11 @@ public class UserService {
 
     public void logout(LogoutRequest logoutReq) throws DataAccessException{
         if(logoutReq.authorization() == null){
+            System.out.println("is null");
             throw new DataAccessException("Error: unauthorized");
         }
         if(!authDao.delete(logoutReq.authorization())){
+            System.out.println("did not delete...");
             throw new DataAccessException("Error: unauthorized");
         }
     }

@@ -3,8 +3,10 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.*;
+import requests.CreateGameRequest;
 import requests.LoginRequest;
 import requests.LogoutRequest;
+import responses.CreateGameResponse;
 
 import java.io.*;
 import java.net.*;
@@ -32,13 +34,11 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, auth, null);
     }
 
-//    public Pet[] listPets() throws ResponseException {
-//        var path = "/pet";
-//        record listPetResponse(Pet[] pet) {
-//        }
-//        var response = this.makeRequest("GET", path, null, listPetResponse.class);
-//        return response.pet();
-//    }
+    public CreateGameResponse createGame(CreateGameRequest gameReq) throws ResponseException{
+        var path = "/game";
+        return this.makeRequest("POST", path, gameReq, gameReq.getAuthorization(), CreateGameResponse.class);
+    }
+
 
     private <T> T makeRequest(String method, String path, Object request, String authorizationHeader, Class<T> responseClass) throws ResponseException {
         try {

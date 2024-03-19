@@ -2,8 +2,10 @@ package ui;
 
 import exception.ResponseException;
 import model.*;
+import requests.CreateGameRequest;
 import requests.LoginRequest;
 import requests.LogoutRequest;
+import responses.CreateGameResponse;
 import server.ServerFacade;
 
 import java.util.Scanner;
@@ -102,17 +104,15 @@ public class UserInterface {
         String userInput[] = readCommand();
         switch(userInput[0]) {
             case ("create"):
-//                if (userInput.length > 2) {
-//                    GameData game = new GameData(userInput[1]);
-//                    try {
-//                        authToken = server.registerUser(usr).getAuthToken();
-//                    } catch (ResponseException e) {
-//                        System.out.println(e.getMessage());
-//                    }
-//                    isLoggedin = true;
-//                    System.out.print("[LOGGED_IN] >>> ");
-//                    printPostLoginUI();
-//                }
+                if (userInput.length > 1) {
+                    try {
+                        CreateGameResponse gameID = server.createGame(new CreateGameRequest(authToken, userInput[1]));
+                        System.out.println(gameID.toString());
+                    } catch (ResponseException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else System.out.println("Not enough arguments");
                 break;
             case ("list"):
 

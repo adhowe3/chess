@@ -4,6 +4,7 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import requests.CreateGameRequest;
+import requests.JoinGameRequest;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import responses.CreateGameResponse;
@@ -127,7 +128,14 @@ public class UserInterface {
                 }
                 break;
             case ("join"):
-
+                JoinGameRequest joinReq = createJoinGameReq(userInput);
+                if(joinReq != null) {
+                    try {
+                        server.joinGame(joinReq);
+                    } catch (ResponseException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
                 break;
             case ("observe"):
 
@@ -151,6 +159,27 @@ public class UserInterface {
                 break;
         }
         System.out.println(userInput[0]);
+    }
+
+    private JoinGameRequest createJoinGameReq(String[] userIn){
+        int gameID;
+        String userColor = null;
+        if(userIn.length > 1){
+            try {
+                 gameID = Integer.parseInt(userIn[1]);
+            } catch (NumberFormatException e) {
+                System.out.println("Not a valid gameID");
+                return null;
+            }
+        }
+        else{
+            System.out.println("Not enough arguments");
+            return null;
+        }
+        if(userIn.length > 2){
+            userColor = userIn[2];
+        }
+        return new JoinGameRequest(authToken, userColor, gameID);
     }
 
     private String[] readCommand(){

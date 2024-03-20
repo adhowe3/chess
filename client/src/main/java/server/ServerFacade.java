@@ -51,7 +51,6 @@ public class ServerFacade {
         this.makeRequest("PUT", path, join, join.getAuthorization(), null);
     }
 
-
     private <T> T makeRequest(String method, String path, Object request, String authorizationHeader, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();

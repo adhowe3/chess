@@ -39,14 +39,14 @@ public class UserInterface {
         }
     }
 
-    public void printPreLoginUI() throws ResponseException {
+    private void printPreLoginUI() throws ResponseException {
         System.out.println(SET_TEXT_COLOR_BLUE+"register <USERNAME> <PASSWORD> <EMAIL>" + SET_TEXT_COLOR_WHITE +"- to create an account");
         System.out.println(SET_TEXT_COLOR_BLUE+"login <USERNAME> <PASSWORD>" + SET_TEXT_COLOR_WHITE +" - to play chess");
         System.out.println(SET_TEXT_COLOR_BLUE+"quit " + SET_TEXT_COLOR_WHITE +"- playing chess");
         System.out.println(SET_TEXT_COLOR_BLUE+"help " + SET_TEXT_COLOR_WHITE +"- with possible commands");
     }
 
-    void readPreLoginCmds() throws ResponseException {
+    private void readPreLoginCmds() throws ResponseException {
         System.out.print("[LOGGED_OUT] >>> ");
         String[] userInput = readCommand();
         switch(userInput[0]) {
@@ -100,7 +100,7 @@ public class UserInterface {
         System.out.println();
     }
 
-    void readPostLoginCmds(){
+    private void readPostLoginCmds(){
         System.out.print("[LOGGED_IN] >>> ");
         String userInput[] = readCommand();
         switch(userInput[0]) {

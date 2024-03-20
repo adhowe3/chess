@@ -138,7 +138,14 @@ public class UserInterface {
                 }
                 break;
             case ("observe"):
-
+                JoinGameRequest observeReq = createObserveReq(userInput);
+                if(observeReq != null) {
+                    try {
+                        server.joinGame(observeReq);
+                    } catch (ResponseException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
                 break;
             case("logout"):
                 try{
@@ -178,6 +185,24 @@ public class UserInterface {
         }
         if(userIn.length > 2){
             userColor = userIn[2];
+        }
+        return new JoinGameRequest(authToken, userColor, gameID);
+    }
+
+    private JoinGameRequest createObserveReq(String[] userIn){
+        int gameID;
+        String userColor = null;
+        if(userIn.length > 1){
+            try {
+                gameID = Integer.parseInt(userIn[1]);
+            } catch (NumberFormatException e) {
+                System.out.println("Not a valid gameID");
+                return null;
+            }
+        }
+        else{
+            System.out.println("Not enough arguments");
+            return null;
         }
         return new JoinGameRequest(authToken, userColor, gameID);
     }

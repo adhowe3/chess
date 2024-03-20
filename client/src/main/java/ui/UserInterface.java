@@ -132,6 +132,7 @@ public class UserInterface {
                 if(joinReq != null) {
                     try {
                         server.joinGame(joinReq);
+                        printChessBoardToTerminalWhite();
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -142,6 +143,7 @@ public class UserInterface {
                 if(observeReq != null) {
                     try {
                         server.joinGame(observeReq);
+                        printChessBoardToTerminalWhite();
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -212,6 +214,78 @@ public class UserInterface {
         String input = scanner.nextLine();
         String inputArray[] = input.split("\\s+");
         return inputArray;
+    }
+
+    private void printChessBoardToTerminalWhite(){
+        String spacing = "\u2001\u2005\u2006";
+        String[] backwardLetters ={(" h"+spacing), (" g"+spacing), (" f"+spacing), (" e"+spacing), (" d"+spacing), (" c"+spacing), (" b"+spacing), " a\u2005"};
+        System.out.print(SET_BG_COLOR_BLACK + EMPTY);
+        for(int i = 0; i < 8; i++){
+            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + backwardLetters[i]);
+        }
+        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
+        System.out.print(SET_BG_COLOR_BLACK + " 1 ");
+
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + BLACK_ROOK);
+        System.out.print(SET_BG_COLOR_RED + BLACK_KNIGHT);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + BLACK_BISHOP);
+        System.out.print(SET_BG_COLOR_RED + BLACK_QUEEN);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + BLACK_KING);
+        System.out.print(SET_BG_COLOR_RED + BLACK_BISHOP);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + BLACK_KNIGHT);
+        System.out.print(SET_BG_COLOR_RED + BLACK_ROOK);
+        System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " 1 " + SET_BG_COLOR_DARK_GREY);
+
+        System.out.print(SET_BG_COLOR_BLACK+" 2 ");
+
+        // print the pawns
+        String backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+        for(int i = 0; i < 8; i++){
+            if((i % 2) >= 1) backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+            else backgroundColor = SET_BG_COLOR_RED;
+            System.out.print(backgroundColor + BLACK_PAWN);
+        }
+        System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " 2 " + SET_BG_COLOR_DARK_GREY);
+        System.out.print(SET_BG_COLOR_BLACK+" 3 ");
+
+        // print the middle board
+        int counter = 0;
+        for(int row = 0; row < 4; row++){
+            for(int i = 0; i < 8; i++){
+                counter++;
+                if((counter % 2) == 1) backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+                else backgroundColor = SET_BG_COLOR_RED;
+                System.out.print(backgroundColor + EMPTY);
+            }
+            System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + (row + 3) + " " + SET_BG_COLOR_DARK_GREY);
+            System.out.print(SET_BG_COLOR_BLACK + " " + (row+4) + " ");
+        }
+
+        //print the white pawns
+        for(int i = 0; i < 8; i++){
+            if((i % 2) == 0) backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+            else backgroundColor = SET_BG_COLOR_RED;
+            System.out.print(backgroundColor + SET_TEXT_COLOR_WHITE + WHITE_PAWN);
+        }
+        System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " 7 " + SET_BG_COLOR_DARK_GREY);
+        System.out.print(SET_BG_COLOR_BLACK +" 8 ");
+
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + WHITE_ROOK);
+        System.out.print(SET_BG_COLOR_RED + WHITE_KNIGHT);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + WHITE_BISHOP);
+        System.out.print(SET_BG_COLOR_RED + WHITE_QUEEN);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + WHITE_KING);
+        System.out.print(SET_BG_COLOR_RED + WHITE_BISHOP);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + WHITE_KNIGHT);
+        System.out.print(SET_BG_COLOR_RED + WHITE_ROOK);
+
+        System.out.println(SET_BG_COLOR_BLACK + " 8 " + SET_BG_COLOR_DARK_GREY);
+        System.out.print(SET_BG_COLOR_BLACK + EMPTY);
+
+        for(int i = 0; i < 8; i++){
+            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + backwardLetters[i]);
+        }
+        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
     }
 
 

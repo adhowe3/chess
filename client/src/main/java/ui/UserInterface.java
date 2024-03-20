@@ -1,11 +1,13 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import requests.CreateGameRequest;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import responses.CreateGameResponse;
+import responses.ListGamesResponse;
 import server.ServerFacade;
 
 import java.util.Scanner;
@@ -115,12 +117,20 @@ public class UserInterface {
                 else System.out.println("Not enough arguments");
                 break;
             case ("list"):
-
+                try {
+                    ListGamesResponse gamesList = server.listGames(authToken);
+                    for(GameData game : gamesList.games()){
+                        System.out.println(game.toString());
+                    }
+                } catch (ResponseException e) {
+                    System.out.println(e.getMessage());
+                }
                 break;
             case ("join"):
-                exit = true;
+
                 break;
             case ("observe"):
+
                 break;
             case("logout"):
                 try{

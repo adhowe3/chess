@@ -7,6 +7,7 @@ import requests.CreateGameRequest;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import responses.CreateGameResponse;
+import responses.ListGamesResponse;
 
 import java.io.*;
 import java.net.*;
@@ -37,6 +38,11 @@ public class ServerFacade {
     public CreateGameResponse createGame(CreateGameRequest gameReq) throws ResponseException{
         var path = "/game";
         return this.makeRequest("POST", path, gameReq, gameReq.getAuthorization(), CreateGameResponse.class);
+    }
+
+    public ListGamesResponse listGames(String auth) throws ResponseException{
+        var path = "/game";
+        return this.makeRequest("GET", path, null, auth, ListGamesResponse.class);
     }
 
 

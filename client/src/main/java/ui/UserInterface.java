@@ -9,6 +9,8 @@ import responses.CreateGameResponse;
 import responses.ListGamesResponse;
 import server.ServerFacade;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -108,7 +110,6 @@ public class UserInterface {
                 if (userInput.length > 1) {
                     try {
                         CreateGameResponse gameID = server.createGame(new CreateGameRequest(authToken, userInput[1]));
-                        System.out.println(gameID.toString());
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -118,9 +119,7 @@ public class UserInterface {
             case ("list"):
                 try {
                     ListGamesResponse gamesList = server.listGames(authToken);
-                    for(GameData game : gamesList.games()){
-                        System.out.println(game.toString());
-                    }
+                    listGames(gamesList);
                 } catch (ResponseException e) {
                     System.out.println(e.getMessage());
                 }
@@ -165,11 +164,25 @@ public class UserInterface {
                 System.out.println("Not a recognized command");
                 break;
         }
-        System.out.println(userInput[0]);
     }
 
+    private Map<Integer, Integer> gameIDMap = new HashMap<>();
+
+    private void listGames(ListGamesResponse gamesList){
+        int listNum = 1;
+        gameIDMap.clear();
+        for(GameData game : gamesList.games()){
+            gameIDMap.put(listNum, game.getGameID());
+            System.out.println(SET_TEXT_COLOR_WHITE + listNum +".) " + "Game_Name: " + SET_TEXT_COLOR_GREEN + game.getGameName() +
+                    SET_TEXT_COLOR_WHITE + " White_Player: " + SET_TEXT_COLOR_GREEN + game.getWhiteUsername()
+                    + SET_TEXT_COLOR_WHITE +" Black_Player: " + SET_TEXT_COLOR_GREEN + game.getBlackUsername() + SET_TEXT_COLOR_WHITE);
+            listNum++;
+        }
+    }
+
+
+
     private JoinGameRequest createJoinGameReq(String[] userIn){
-        int gameID;
         String userColor = null;
         JoinGameRequest req = createObserveReq(userIn);
         if(req == null){
@@ -183,10 +196,11 @@ public class UserInterface {
     }
 
     private JoinGameRequest createObserveReq(String[] userIn){
+        int gameListNum;
         int gameID;
         if(userIn.length > 1){
             try {
-                gameID = Integer.parseInt(userIn[1]);
+                gameListNum = Integer.parseInt(userIn[1]);
             } catch (NumberFormatException e) {
                 System.out.println("Not a valid gameID");
                 return null;
@@ -196,6 +210,8 @@ public class UserInterface {
             System.out.println("Not enough arguments");
             return null;
         }
+        // the numbers in the list correspond to a game ID
+        gameID = gameIDMap.get(gameListNum);
         return new JoinGameRequest(authToken, null, gameID);
     }
 

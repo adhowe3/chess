@@ -60,7 +60,7 @@ public class GameService {
             throw new DataAccessException("Error: already taken");
         }
         else{
-            throw new DataAccessException("Error: already taken");
+            throw new DataAccessException("Error: bad request");
         }
 
     }

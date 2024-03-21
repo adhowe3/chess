@@ -48,4 +48,5 @@ public class RegisterTest {
         Assertions.assertEquals("Error: already taken", exception.getMessage(), "Thrown exception did not match expected");
     }
 
+
 }

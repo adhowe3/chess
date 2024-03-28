@@ -13,9 +13,7 @@ import responses.CreateGameResponse;
 import responses.ListGamesResponse;
 import server.ServerFacade;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 
@@ -28,6 +26,7 @@ public class UserInterface {
     private boolean exit = false;
     private String authToken;
 
+    private List<GameData> gameDataList = new ArrayList<GameData>();
     public UserInterface(String serverUrl){
         server = new ServerFacade(serverUrl);
     }
@@ -123,6 +122,7 @@ public class UserInterface {
             case ("list"):
                 try {
                     ListGamesResponse gamesList = server.listGames(authToken);
+                    gameDataList = gamesList.games();
                     listGames(gamesList);
                 } catch (ResponseException e) {
                     System.out.println(e.getMessage());
@@ -133,10 +133,13 @@ public class UserInterface {
                 if(joinReq != null) {
                     try {
                         server.joinGame(joinReq);
-                        printBothChessBoards();
+                        printBothChessBoards(joinReq.getGameIndex());
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
+                }
+                else{
+                    System.out.println("Not a valid request");
                 }
                 break;
             case ("observe"):
@@ -144,10 +147,13 @@ public class UserInterface {
                 if(observeReq != null) {
                     try {
                         server.joinGame(observeReq);
-                        printBothChessBoards();
+                        printBothChessBoards(observeReq.getgameID());
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
+                }
+                else{
+                    System.out.println("Not a valid request");
                 }
                 break;
             case("logout"):
@@ -184,8 +190,6 @@ public class UserInterface {
         }
     }
 
-
-
     private JoinGameRequest createJoinGameReq(String[] userIn){
         String userColor = null;
         JoinGameRequest req = createObserveReq(userIn);
@@ -215,8 +219,9 @@ public class UserInterface {
             return null;
         }
         // the numbers in the list correspond to a game ID
+        if(gameListNum > gameIDMap.size()) return null;
         gameID = gameIDMap.get(gameListNum);
-        return new JoinGameRequest(authToken, null, gameID);
+        return new JoinGameRequest(authToken, null, gameID, gameListNum);
     }
 
     private String[] readCommand(){
@@ -225,9 +230,8 @@ public class UserInterface {
         return input.split("\\s+");
     }
 
-    private void printBothChessBoards(){
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
+    private void printBothChessBoards(int gameIndex){
+        ChessBoard board = gameDataList.get(gameIndex-1).getGame().getBoard();
         printChessBoardToTerminalWhite(board);
         System.out.println();
         printChessBoardToTerminalBlack(board);

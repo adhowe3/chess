@@ -136,7 +136,7 @@ public class UserInterface {
                 if(joinReq != null) {
                     try {
                         server.joinGame(joinReq);
-                        gamePlayUI = new gamePlayUserInterface(joinReq.getGameIndex(), gameDataList, joinReq.getPlayerColor());
+                        gamePlayUI = new gamePlayUserInterface(server, joinReq);
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -150,7 +150,7 @@ public class UserInterface {
                 if(observeReq != null) {
                     try {
                         server.joinGame(observeReq);
-                        gamePlayUI = new gamePlayUserInterface(observeReq.getGameIndex(), gameDataList, observeReq.getPlayerColor());
+                        gamePlayUI = new gamePlayUserInterface(server, observeReq);
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -186,7 +186,7 @@ public class UserInterface {
         gameIDMap.clear();
         for(GameData game : gamesList.games()){
             gameIDMap.put(listNum, game.getGameID());
-            System.out.println(SET_TEXT_COLOR_WHITE + listNum +".) " + "Game_Name: " + SET_TEXT_COLOR_GREEN + game.getGameName() +
+            System.out.println(SET_TEXT_COLOR_WHITE + listNum +".) " +"gameID: " + game.getGameID() + "Game_Name: " + SET_TEXT_COLOR_GREEN + game.getGameName() +
                     SET_TEXT_COLOR_WHITE + " White_Player: " + SET_TEXT_COLOR_GREEN + game.getWhiteUsername()
                     + SET_TEXT_COLOR_WHITE +" Black_Player: " + SET_TEXT_COLOR_GREEN + game.getBlackUsername() + SET_TEXT_COLOR_WHITE);
             listNum++;
@@ -233,108 +233,9 @@ public class UserInterface {
         return input.split("\\s+");
     }
 
-    private void printBothChessBoards(int gameIndex){
-        ChessBoard board = gameDataList.get(gameIndex-1).getGame().getBoard();
-        printChessBoardToTerminalWhite(board);
-        System.out.println();
-        printChessBoardToTerminalBlack(board);
-    }
 
-    private void printSquareToTerminal(String bgColor, ChessPiece chessPiece){
-        String textColor = SET_TEXT_COLOR_WHITE;
-        String pieceString;
-        if(chessPiece == null) pieceString = EMPTY;
-        else if(chessPiece.getTeamColor() == ChessGame.TeamColor.BLACK){
-            textColor = SET_TEXT_COLOR_BLACK;
-           pieceString = getPieceString(chessPiece, BLACK_KING, BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT, BLACK_PAWN);
-        }
-        else{
-            pieceString = getPieceString(chessPiece, WHITE_KING, WHITE_QUEEN, WHITE_ROOK, WHITE_BISHOP, WHITE_KNIGHT, WHITE_PAWN);
-        }
-        System.out.print(bgColor + textColor +  pieceString);
-    }
 
-    private String getPieceString(ChessPiece chessPiece, String blackKing, String blackQueen, String blackRook, String blackBishop, String blackKnight, String blackPawn) {
-        String pieceString;
-        if(chessPiece == null) return EMPTY;
-        switch(chessPiece.getPieceType()){
-            case KING -> pieceString = blackKing;
-            case QUEEN -> pieceString = blackQueen;
-            case ROOK -> pieceString = blackRook;
-            case BISHOP -> pieceString = blackBishop;
-            case KNIGHT -> pieceString = blackKnight;
-            case PAWN -> pieceString = blackPawn;
-            default -> pieceString = EMPTY;
-        }
-        return pieceString;
-    }
 
-    private void printChessBoardToTerminalBlack(ChessBoard chessBoard){
-        String spacing = "\u2001\u2005\u2006";
-        String backgroundColor = SET_BG_COLOR_LIGHT_GREY;
-        String[] backwardLetters ={(" h"+spacing), (" g"+spacing), (" f"+spacing), (" e"+spacing), (" d"+spacing), (" c"+spacing), (" b"+spacing), " a\u2005"};
-        System.out.print(SET_BG_COLOR_BLACK + EMPTY);
-        for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + backwardLetters[i]);
-        }
-        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
-        System.out.print(SET_BG_COLOR_BLACK + " 1 ");
-
-        for(int row = 1; row < 9; row++){
-            for(int col = 1; col < 9; col++){
-                printSquareToTerminal(backgroundColor, chessBoard.getPiece(new ChessPosition(row,col)));
-                backgroundColor = flipBgColor(backgroundColor);
-            }
-            System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);
-            if(row < 8) System.out.print(SET_BG_COLOR_BLACK+ " " + (row+1) + " ");
-            backgroundColor = flipBgColor(backgroundColor);
-        }
-
-        System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + EMPTY);
-        for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + backwardLetters[i]);
-        }
-        System.out.println(EMPTY  + SET_BG_COLOR_DARK_GREY);
-    }
-
-    private void printChessBoardToTerminalWhite(ChessBoard chessBoard){
-        String spacing = "\u2001\u2005\u2006";
-        String backgroundColor = SET_BG_COLOR_LIGHT_GREY;
-        String[] forwardLetters ={(" a"+spacing), (" b"+spacing), (" c"+spacing), (" d"+spacing), (" e"+spacing), (" f"+spacing), (" g"+spacing), " h\u2005"};
-
-        System.out.print(SET_BG_COLOR_BLACK + EMPTY);
-        for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + forwardLetters[i]);
-        }
-        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
-        System.out.print(SET_BG_COLOR_BLACK + " 8 ");
-
-        for(int row = 8; row >= 1; row--){
-            for(int col = 8; col >= 1; col--){
-                printSquareToTerminal(backgroundColor, chessBoard.getPiece(new ChessPosition(row,col)));
-                backgroundColor = flipBgColor(backgroundColor);
-            }
-            System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);
-            if(row > 1) System.out.print(SET_BG_COLOR_BLACK+ " " + (row-1) + " ");
-            backgroundColor = flipBgColor(backgroundColor);
-        }
-        System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + EMPTY);
-        for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + forwardLetters[i]);
-        }
-        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
-    }
-
-    private String flipBgColor(String currColor){
-        if(currColor.equals(SET_BG_COLOR_LIGHT_GREY)){
-            return SET_BG_COLOR_RED;
-        }
-        if(currColor.equals(SET_BG_COLOR_RED)){
-            return SET_BG_COLOR_LIGHT_GREY;
-        }
-        // error case
-        return SET_BG_COLOR_BLUE;
-    }
 
 
 }

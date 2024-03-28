@@ -1,10 +1,12 @@
 package requests;
 
+import chess.ChessGame;
+
 import java.util.Objects;
 
 public class JoinGameRequest {
     private String authorization;
-    private String playerColor;
+    String playerColor;
     private Integer gameID;
 
     private Integer gameIndex;

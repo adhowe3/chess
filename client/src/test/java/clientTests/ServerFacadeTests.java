@@ -1,5 +1,6 @@
 package clientTests;
 
+import chess.ChessGame;
 import dataAccess.*;
 import exception.ResponseException;
 import model.AuthData;
@@ -183,7 +184,7 @@ public class ServerFacadeTests {
         AuthData resResult = serverFacade.registerUser(u);
         CreateGameRequest gameReq = new CreateGameRequest(resResult.getAuthToken(), "gameName");
         CreateGameResponse gameRes = serverFacade.createGame(gameReq);
-        JoinGameRequest joinReq = new JoinGameRequest(resResult.getAuthToken(), "WHITE", gameRes.gameID());
+        JoinGameRequest joinReq = new JoinGameRequest(resResult.getAuthToken(), "WHITE", gameRes.gameID(), 1);
         serverFacade.joinGame(joinReq);
 
         Assertions.assertEquals(joinReq.getgameID(),  gameDao.getAll().getFirst().getGameID());
@@ -198,8 +199,8 @@ public class ServerFacadeTests {
         AuthData resResult = serverFacade.registerUser(u);
         CreateGameRequest gameReq = new CreateGameRequest(resResult.getAuthToken(), "gameName");
         CreateGameResponse gameRes = serverFacade.createGame(gameReq);
-
-        JoinGameRequest joinReq = new JoinGameRequest(resResult.getAuthToken(), "bad color", gameRes.gameID());
+        String[] userInput = {"join", "1", "badcolor"};
+        JoinGameRequest joinReq = new JoinGameRequest(resResult.getAuthToken(), "bad color", gameRes.gameID(), 1);
         ResponseException exception = assertThrows(ResponseException.class, () -> serverFacade.joinGame(joinReq));
         // Assert the message of the exception
         Assertions.assertEquals("failure: 400", exception.getMessage(), "Thrown exception did not match expected");

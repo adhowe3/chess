@@ -61,7 +61,7 @@ public class GameTest {
         gameDao.add(gm);
         AuthData au = new AuthData("testAuth", "Sam");
         authDao.add(au);
-        JoinGameRequest joinReq = new JoinGameRequest(au.getAuthToken(),"WHITE", 123);
+        JoinGameRequest joinReq = new JoinGameRequest(au.getAuthToken(),"WHITE", 123, 1);
         service.joinGame(joinReq);
         GameData compGm = new GameData(123, au.getUsername(), null, "SecondGame", new ChessGame());
         Assertions.assertEquals(compGm, gameDao.getGameDataFromID(123), "Joining the game did not match expected database");
@@ -73,7 +73,7 @@ public class GameTest {
         gameDao.add(gm);
         AuthData au = new AuthData("testAuth", "Sam");
         authDao.add(au);
-        JoinGameRequest joinReq = new JoinGameRequest(au.getAuthToken(), "WHITE", 123);
+        JoinGameRequest joinReq = new JoinGameRequest(au.getAuthToken(), "WHITE", 123, 1);
 
         DataAccessException exception = assertThrows(DataAccessException.class, () -> service.joinGame(joinReq));
         Assertions.assertEquals("Error: already taken", exception.getMessage(), "Allowed user to take an already taken color");

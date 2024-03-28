@@ -1,9 +1,8 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+import dataAccess.GameDAO;
+import dataAccess.MySQLGameDAO;
 import exception.ResponseException;
 import model.GameData;
 import requests.CreateGameRequest;
@@ -40,9 +39,18 @@ public class gamePlayUserInterface {
     }
     public void runUI() throws ResponseException {
         initalPrintScreen();
-        if(playerColor == null) printChessBoardToTerminalWhite();
-        else if(playerColor.equals("BLACK")) printChessBoardToTerminalBlack();
-        else printChessBoardToTerminalWhite();
+        if(playerColor == null){
+//            sendJoinObserver();
+            printChessBoardToTerminalWhite();
+        }
+        else if(playerColor.equals("BLACK")){
+            sendJoinPlayer();
+            printChessBoardToTerminalBlack();
+        }
+        else{
+            sendJoinPlayer();
+            printChessBoardToTerminalWhite();
+        }
         while(isPlaying){
             readGamePlayCmds();
         }
@@ -54,6 +62,10 @@ public class gamePlayUserInterface {
         else textString = ("playing as " + playerColor + " in ");
         System.out.println(SET_TEXT_COLOR_WHITE + BLACK_KING + "You are now " + textString
                 + "game: " + gameData.getGameName() + ". Type help to get started" + WHITE_KING);
+    }
+
+    private sendJoinPlayer(){
+
     }
 
     private String[] readCommand(){
@@ -84,8 +96,13 @@ public class gamePlayUserInterface {
                     isPlaying = false;
                     System.out.println("Leaving game: " + gameData.getGameName());
                 break;
-            case ("make"):
-
+            case ("move"):
+                try{
+                    ChessMove move = getMoveFromCommand(userInput);
+                    makeMove(move);
+                }catch(Exception e){
+                    System.out.println(e.getMessage());
+                }
                 break;
             case("resign"):
 
@@ -96,6 +113,26 @@ public class gamePlayUserInterface {
                 System.out.println("Not a recognized command");
                 break;
         }
+    }
+
+    private ChessMove getMoveFromCommand(String[] userInput){
+        if(userInput.length > 3){
+            String from = userInput[1];
+            String to = userInput[2];
+            return new ChessMove(getPositionFromString(from), getPositionFromString(to));
+        }
+        else return null;
+    }
+
+    private ChessPosition getPositionFromString(String str){
+        if(str.length() < 2) return null;
+        int col = str.charAt(0) - 'a';
+        int row = str.charAt(1);
+        return new ChessPosition(row, col);
+    }
+
+    private void makeMove(ChessMove move){
+        //FIX ME
     }
 
     private void redraw() throws ResponseException {
@@ -112,9 +149,9 @@ public class gamePlayUserInterface {
 
     private void printGamePlayUI(){
         System.out.println(SET_TEXT_COLOR_BLUE+"help " + SET_TEXT_COLOR_WHITE +"- with possible commands");
-        System.out.println(SET_TEXT_COLOR_BLUE+"redraw chess board " + SET_TEXT_COLOR_WHITE +" -redraws the board");
+        System.out.println(SET_TEXT_COLOR_BLUE+"redraw " + SET_TEXT_COLOR_WHITE +" -redraws the board");
         System.out.println(SET_TEXT_COLOR_BLUE+"leave" + SET_TEXT_COLOR_WHITE +" - removes yourself from the game");
-        System.out.println(SET_TEXT_COLOR_BLUE+"make move [MOVE] " + SET_TEXT_COLOR_WHITE +"- make a move in the game");
+        System.out.println(SET_TEXT_COLOR_BLUE+"move [FROM] [TO] " + SET_TEXT_COLOR_WHITE +"- make a move in the game ex. b2 f3");
         System.out.println(SET_TEXT_COLOR_BLUE+"resign " + SET_TEXT_COLOR_WHITE +"- forfeit the game");
         System.out.println(SET_TEXT_COLOR_BLUE+"highlight legal moves [PIECE LOCATION]" + SET_TEXT_COLOR_WHITE +"- display the possible moves for give piece");
         System.out.println();

@@ -23,8 +23,11 @@ public class UserInterface {
     private ServerFacade server;
 
     private boolean isLoggedin = false;
+    private boolean isInGamePlay = false;
     private boolean exit = false;
     private String authToken;
+
+    private gamePlayUserInterface gamePlayUI;
 
     private List<GameData> gameDataList = new ArrayList<GameData>();
     public UserInterface(String serverUrl){
@@ -38,7 +41,7 @@ public class UserInterface {
             if(!isLoggedin){
                 readPreLoginCmds();
             }
-            else{
+            else if(isLoggedin){
                 readPostLoginCmds();
             }
         }
@@ -133,7 +136,7 @@ public class UserInterface {
                 if(joinReq != null) {
                     try {
                         server.joinGame(joinReq);
-                        printBothChessBoards(joinReq.getGameIndex());
+                        gamePlayUI = new gamePlayUserInterface(joinReq.getGameIndex(), gameDataList, joinReq.getPlayerColor());
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -147,7 +150,7 @@ public class UserInterface {
                 if(observeReq != null) {
                     try {
                         server.joinGame(observeReq);
-                        printBothChessBoards(observeReq.getgameID());
+                        gamePlayUI = new gamePlayUserInterface(observeReq.getGameIndex(), gameDataList, observeReq.getPlayerColor());
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }

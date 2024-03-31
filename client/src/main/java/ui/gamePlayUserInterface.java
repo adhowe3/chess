@@ -64,9 +64,9 @@ public class gamePlayUserInterface {
                 + "game: " + gameData.getGameName() + ". Type help to get started" + WHITE_KING);
     }
 
-    private sendJoinPlayer(){
-
-    }
+//    private sendJoinPlayer(){
+//
+//    }
 
     private String[] readCommand(){
         while(!scanner.hasNext()){}

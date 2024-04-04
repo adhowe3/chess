@@ -8,4 +8,15 @@ public class JoinPlayerCommand extends UserGameCommand{
         this.commandType = CommandType.JOIN_PLAYER;
         this.color = color;
     }
+
+    public ChessGame.TeamColor getColor(){
+        return color;
+    }
+
+    public String getColorStr(){
+        if(color == null) return "observer";
+        if(color.equals(ChessGame.TeamColor.WHITE))
+            return "WHITE";
+        else return "BLACK";
+    }
 }

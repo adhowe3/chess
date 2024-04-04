@@ -34,7 +34,11 @@ public class JoinGameRequest {
         return authorization;
     }
 
-    public void setPlayerColor(String color){this.playerColor = color;    }
+    public void setPlayerColor(String color){
+        if(color.equals("WHITE") || color.equals("BLACK")){
+            this.playerColor = color;
+        }
+    }
 
     public void setAuthorization(String authorization) {
         this.authorization = authorization;

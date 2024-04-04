@@ -30,7 +30,7 @@ public class UserInterface {
     private gamePlayUserInterface gamePlayUI;
 
     private List<GameData> gameDataList = new ArrayList<GameData>();
-    public UserInterface(String serverUrl){
+    public UserInterface(String serverUrl) throws ResponseException {
         server = new ServerFacade(serverUrl);
     }
 

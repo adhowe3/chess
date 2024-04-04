@@ -1,14 +1,15 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.*;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import requests.LoginRequest;
-import requests.LogoutRequest;
 import responses.CreateGameResponse;
 import responses.ListGamesResponse;
+import websocket.WebSocketFacade;
 
 import java.io.*;
 import java.net.*;
@@ -16,9 +17,15 @@ import java.net.*;
 public class ServerFacade {
 
     private final String serverUrl;
+    private WebSocketFacade wsFacade;
 
-    public ServerFacade(String url) {
+    public ServerFacade(String url) throws ResponseException {
         serverUrl = url;
+        this.wsFacade = new WebSocketFacade(url);
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
     }
 
     public AuthData registerUser(UserData user) throws ResponseException {
@@ -49,6 +56,15 @@ public class ServerFacade {
     public void joinGame(JoinGameRequest join) throws ResponseException{
         var path = "/game";
         this.makeRequest("PUT", path, join, join.getAuthorization(), null);
+        wsFacade.joinChessGame(join.getAuthorization(), strToTeamColor(join.getPlayerColor()));
+    }
+
+    private ChessGame.TeamColor strToTeamColor(String color){
+        if(color == null) return null;
+        if(color.equals("BLACK")){
+            return ChessGame.TeamColor.BLACK;
+        }
+        else return ChessGame.TeamColor.WHITE;
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authorizationHeader, Class<T> responseClass) throws ResponseException {

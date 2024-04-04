@@ -1,17 +1,11 @@
 package ui;
 
 import chess.*;
-import dataAccess.GameDAO;
-import dataAccess.MySQLGameDAO;
 import exception.ResponseException;
-import model.GameData;
-import requests.CreateGameRequest;
 import requests.JoinGameRequest;
-import responses.CreateGameResponse;
-import responses.ListGamesResponse;
 import server.ServerFacade;
+import websocket.WebSocketFacade;
 
-import java.util.List;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -19,36 +13,33 @@ import static ui.EscapeSequences.SET_BG_COLOR_BLUE;
 
 public class gamePlayUserInterface {
 
-    private GameData gameData;
     private ChessGame chessGame;
     private String playerColor;
     private String auth;
     private Boolean isPlaying = true;
-    private ServerFacade server;
+    private ServerFacade serverFacade;
+
+    private WebSocketFacade wsFacade;
 
     private Scanner scanner = new Scanner(System.in);
 
     public gamePlayUserInterface(ServerFacade server, JoinGameRequest joinReq) throws ResponseException {
-        this.server = server;
+        this.wsFacade = new WebSocketFacade(server.getServerUrl());
+        this.serverFacade = server;
         this.playerColor = joinReq.getPlayerColor();
         this.auth = joinReq.getAuthorization();
-        ListGamesResponse listResponse = server.listGames(auth);
-        this.gameData = listResponse.games().get(joinReq.getGameIndex() - 1);
-        this.chessGame = gameData.getGame();
         this.runUI();
     }
     public void runUI() throws ResponseException {
-        initalPrintScreen();
+        initialPrintScreen();
         if(playerColor == null){
 //            sendJoinObserver();
             printChessBoardToTerminalWhite();
         }
         else if(playerColor.equals("BLACK")){
-//            sendJoinPlayer();
             printChessBoardToTerminalBlack();
         }
         else{
-//            sendJoinPlayer();
             printChessBoardToTerminalWhite();
         }
         while(isPlaying){
@@ -56,17 +47,14 @@ public class gamePlayUserInterface {
         }
     }
 
-    private void initalPrintScreen(){
+    private void initialPrintScreen(){
         String textString;
         if(playerColor == null) textString = "observing ";
-        else textString = ("playing as " + playerColor + " in ");
+        else textString = ("playing as " + playerColor);
         System.out.println(SET_TEXT_COLOR_WHITE + BLACK_KING + "You are now " + textString
-                + "game: " + gameData.getGameName() + ". Type help to get started" + WHITE_KING);
+                + ". Type help to get started" + WHITE_KING);
     }
 
-//    private sendJoinPlayer(){
-//
-//    }
 
     private String[] readCommand(){
         while(!scanner.hasNext()){}
@@ -87,14 +75,14 @@ public class gamePlayUserInterface {
                 break;
             case ("redraw"):
                 try{
-                    redraw();
+
                 }catch(Exception e){
                     System.out.println(e.getMessage());
                 }
                 break;
             case ("leave"):
                     isPlaying = false;
-                    System.out.println("Leaving game: " + gameData.getGameName());
+                    System.out.println("Leaving game: ");
                 break;
             case ("move"):
                 try{
@@ -135,17 +123,17 @@ public class gamePlayUserInterface {
         //FIX ME
     }
 
-    private void redraw() throws ResponseException {
-        // update current gameData with database gameData
-        ListGamesResponse ls = server.listGames(auth);
-        for(GameData gameData : ls.games()){
-            if(gameData.getGameID() == this.gameData.getGameID()){
-                this.gameData = gameData;
-            }
-        }
-        if(playerColor.equals("BLACK")) printChessBoardToTerminalBlack();
-        else printChessBoardToTerminalWhite();
-    }
+//    private void redraw() throws ResponseException {
+//        // update current gameData with database gameData
+//        ListGamesResponse ls = server.listGames(auth);
+//        for(GameData gameData : ls.games()){
+//            if(gameData.getGameID() == this.gameData.getGameID()){
+//                this.gameData = gameData;
+//            }
+//        }
+//        if(playerColor.equals("BLACK")) printChessBoardToTerminalBlack();
+//        else printChessBoardToTerminalWhite();
+//    }
 
     private void printGamePlayUI(){
         System.out.println(SET_TEXT_COLOR_BLUE+"help " + SET_TEXT_COLOR_WHITE +"- with possible commands");
@@ -256,12 +244,9 @@ public class gamePlayUserInterface {
         return SET_BG_COLOR_BLUE;
     }
 
-
-
     @Override
     public String toString() {
         return "gamePlayUserInterface{" +
-                "gameData=" + gameData +
                 ", playerColor='" + playerColor + '\'' +
                 ", auth='" + auth + '\'' +
                 '}';

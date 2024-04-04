@@ -1,12 +1,16 @@
 package server;
 import handlers.Handler;
 import spark.*;
+import websocket.WebSocketHandler;
 
+import java.net.http.WebSocket;
 
 public class Server {
     private Handler handler;
+    private WebSocketHandler webSocketHandler;
     public Server() {
         handler = new Handler();
+        webSocketHandler = new WebSocketHandler();
     }
 
     public int run(int desiredPort) {
@@ -23,6 +27,7 @@ public class Server {
         Spark.post("/game", (req, res) -> handler.createGame(req,res));
         Spark.put("/game", (req, res) -> handler.joinGame(req,res));
         Spark.get("/game", (req, res) -> handler.listGames(req, res));
+        Spark.webSocket("/connect", webSocketHandler);
 
         Spark.awaitInitialization();
         return Spark.port();

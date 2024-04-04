@@ -44,11 +44,11 @@ public class gamePlayUserInterface {
             printChessBoardToTerminalWhite();
         }
         else if(playerColor.equals("BLACK")){
-            sendJoinPlayer();
+//            sendJoinPlayer();
             printChessBoardToTerminalBlack();
         }
         else{
-            sendJoinPlayer();
+//            sendJoinPlayer();
             printChessBoardToTerminalWhite();
         }
         while(isPlaying){

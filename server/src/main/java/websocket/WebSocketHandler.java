@@ -1,11 +1,13 @@
 package websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccess.*;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
@@ -56,23 +58,16 @@ public class WebSocketHandler {
                 notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
                 connections.broadcast(auth, notificationMessage);
             }
-            for(GameData gameData : gameDao.getAll()){
-               if(gameData.) userDao.getUser(authDao.getDataFromToken(auth).getUsername());
+            GameData gameData = gameDao.getGameDataFromID(command.getGameID());
+            if(gameData != null){
+               String game = new Gson().toJson(new LoadGameMessage(gameData.getGame()));
+               session.getRemote().sendString(game);
             }
-            gameDao.getGameDataFromID().
-            if(gameDao.getGameDataFromID(gameDao.) ){
-
-            }
-            session.getRemote().sendString("You joined a game");
         }
         catch(DataAccessException e){
             notificationMessage = new NotificationMessage("error: " + e.getMessage());
             connections.broadcast(auth, notificationMessage);
         }
-    }
-
-    public void sendString(String str){
-        session.getRemote().sendString(str);
     }
 
 }

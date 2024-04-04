@@ -40,9 +40,9 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinChessGame(String authToken, ChessGame.TeamColor color) throws ResponseException {
+    public void joinChessGame(String authToken, ChessGame.TeamColor color, Integer gameID) throws ResponseException {
         try {
-            var command = new JoinPlayerCommand(authToken, color);
+            var command = new JoinPlayerCommand(authToken, color, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());

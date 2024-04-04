@@ -56,7 +56,7 @@ public class ServerFacade {
     public void joinGame(JoinGameRequest join) throws ResponseException{
         var path = "/game";
         this.makeRequest("PUT", path, join, join.getAuthorization(), null);
-        wsFacade.joinChessGame(join.getAuthorization(), strToTeamColor(join.getPlayerColor()));
+        wsFacade.joinChessGame(join.getAuthorization(), strToTeamColor(join.getPlayerColor()), join.getgameID());
     }
 
     private ChessGame.TeamColor strToTeamColor(String color){

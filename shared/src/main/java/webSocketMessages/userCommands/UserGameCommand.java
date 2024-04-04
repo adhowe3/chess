@@ -24,6 +24,8 @@ public class UserGameCommand {
 
     protected CommandType commandType;
 
+    protected Integer gameID;
+
     private final String authToken;
 
     public String getAuthString() {
@@ -32,6 +34,10 @@ public class UserGameCommand {
 
     public CommandType getCommandType() {
         return this.commandType;
+    }
+
+    public Integer getGameID() {
+        return gameID;
     }
 
     @Override

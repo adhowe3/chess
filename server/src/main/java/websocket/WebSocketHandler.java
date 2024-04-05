@@ -56,17 +56,13 @@ public class WebSocketHandler {
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
                 GameData gameData = gameDao.getGameDataFromID(command.getGameID());
-                if(gameData == null){
-                    String errorMessage = new Gson().toJson(new ErrorMessage("Error: bad gameID"));
-                    session.getRemote().sendString(errorMessage);
-                }
-                else{
-                    ServerMessage jsonMessage = messageMaker(gameData, name, command);
-                    session.getRemote().sendString(new Gson().toJson(jsonMessage));
-                    if(!jsonMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
-                        notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
-                        connections.broadcast(auth, notificationMessage);
-                    }
+                ServerMessage jsonMessage = messageMaker(gameData, name, command);
+                session.getRemote().sendString(new Gson().toJson(jsonMessage));
+
+                // if it's not an error message, then notify all the other players that the person joined successfully
+                if(!jsonMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
+                    notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
+                    connections.broadcast(auth, notificationMessage);
                 }
             }
             else{
@@ -81,9 +77,6 @@ public class WebSocketHandler {
     }
 
     private ServerMessage messageMaker(GameData gameData, String name, JoinPlayerCommand command){
-        ErrorMessage error;
-        System.out.println("gameData id: " + gameData.getGameID());
-        System.out.println("command id: " + command.getGameID());
         if(command.getColor() == null)
         {
             return new ErrorMessage("Error: no team color");

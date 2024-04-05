@@ -7,6 +7,8 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.xml.sax.ErrorHandler;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
@@ -53,21 +55,60 @@ public class WebSocketHandler {
         try{
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
-                notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
-                System.out.println(String.format("%s joining as %s", name, command.getColorStr()));
-                connections.broadcast(auth, notificationMessage);
+                GameData gameData = gameDao.getGameDataFromID(command.getGameID());
+                if(gameData == null){
+                    String errorMessage = new Gson().toJson(new ErrorMessage("Error: bad gameID"));
+                    session.getRemote().sendString(errorMessage);
+                }
+                else{
+                    ServerMessage jsonMessage = messageMaker(gameData, name, command);
+                    session.getRemote().sendString(new Gson().toJson(jsonMessage));
+                    if(!jsonMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
+                        notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
+                        connections.broadcast(auth, notificationMessage);
+                    }
+                }
             }
-            GameData gameData = gameDao.getGameDataFromID(command.getGameID());
-            if(gameData != null){
-               LoadGameMessage game = new LoadGameMessage(gameData);
-               String gameStr = new Gson().toJson(game);
-               System.out.println(gameStr);
-               session.getRemote().sendString(new Gson().toJson(game));
+            else{
+                String errorMessage = new Gson().toJson(new ErrorMessage("Error: bad authToken"));
+                session.getRemote().sendString(errorMessage);
             }
         }
         catch(DataAccessException e){
             notificationMessage = new NotificationMessage("error: " + e.getMessage());
             connections.broadcast(auth, notificationMessage);
+        }
+    }
+
+    private ServerMessage messageMaker(GameData gameData, String name, JoinPlayerCommand command){
+        ErrorMessage error;
+        System.out.println("gameData id: " + gameData.getGameID());
+        System.out.println("command id: " + command.getGameID());
+        if(gameData.getGameID() != command.getGameID()){
+            return new ErrorMessage("Error: bad gameID");
+        }
+        if(command.getColor() == null)
+        {
+            return new ErrorMessage("Error: no team color");
+        }
+        else if(command.getColor().equals(ChessGame.TeamColor.BLACK)){
+            if(gameData.getBlackUsername() == null || !gameData.getBlackUsername().equals(name)){
+                return new ErrorMessage("Error: wrong team color");
+            }
+            else{
+                return new LoadGameMessage(gameData);
+            }
+        }
+        else if(command.getColor().equals(ChessGame.TeamColor.WHITE)){
+            if(gameData.getWhiteUsername() == null || !gameData.getWhiteUsername().equals(name)){
+                return new ErrorMessage("Error: wrong team color");
+            }
+            else{
+                return new LoadGameMessage(gameData);
+            }
+        }
+        else{
+            return new LoadGameMessage(gameData);
         }
     }
 

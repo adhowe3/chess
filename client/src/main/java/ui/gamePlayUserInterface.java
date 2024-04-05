@@ -33,7 +33,6 @@ public class gamePlayUserInterface {
     public void runUI() throws ResponseException {
         initialPrintScreen();
         if(playerColor == null){
-//            sendJoinObserver();
             printChessBoardToTerminalWhite();
         }
         else if(playerColor.equals("BLACK")){
@@ -54,7 +53,6 @@ public class gamePlayUserInterface {
         System.out.println(SET_TEXT_COLOR_WHITE + BLACK_KING + "You are now " + textString
                 + ". Type help to get started" + WHITE_KING);
     }
-
 
     private String[] readCommand(){
         while(!scanner.hasNext()){}

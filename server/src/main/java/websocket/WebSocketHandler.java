@@ -22,15 +22,10 @@ public class WebSocketHandler {
     private AuthDAO authDao;
     private UserDAO userDao;
     private final ConnectionManager connections = new ConnectionManager();
-    public WebSocketHandler(){
-        try{
-            this.gameDao = new MySQLGameDAO();
-            this.authDao = new MySQLAuthDAO();
-            this.userDao = new MySQLUserDAO();
-        }
-        catch(DataAccessException e){
-            System.out.println("Failed to initialize the database");
-        }
+    public WebSocketHandler(GameDAO gameDao, AuthDAO authDao, UserDAO userDao){
+        this.gameDao = gameDao;
+        this.authDao = authDao;
+        this.userDao = userDao;
     }
 
     @OnWebSocketMessage
@@ -41,7 +36,10 @@ public class WebSocketHandler {
                 JoinPlayerCommand jpCommand = new Gson().fromJson(message, JoinPlayerCommand.class);
                 joinChessGame(jpCommand, session);
             break;
-//            case JOIN_OBSERVER -> exit(action.visitorName());
+            case JOIN_OBSERVER:
+                 System.out.println("join oserver websocket handler");
+//               exit(action.visitorName());
+            break;
 //            case MAKE_MOVE -> ;
 //            case LEAVE -> ;
 //            case RESIGN -> ;
@@ -53,15 +51,18 @@ public class WebSocketHandler {
         NotificationMessage notificationMessage;
         connections.add(auth, session);
         try{
-            if(authDao.getDataFromToken(auth) == null) {
+            if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
                 notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
+                System.out.println(String.format("%s joining as %s", name, command.getColorStr()));
                 connections.broadcast(auth, notificationMessage);
             }
             GameData gameData = gameDao.getGameDataFromID(command.getGameID());
             if(gameData != null){
-               String game = new Gson().toJson(new LoadGameMessage(gameData.getGame()));
-               session.getRemote().sendString(game);
+               LoadGameMessage game = new LoadGameMessage(gameData);
+               String gameStr = new Gson().toJson(game);
+               System.out.println(gameStr);
+               session.getRemote().sendString(new Gson().toJson(game));
             }
         }
         catch(DataAccessException e){

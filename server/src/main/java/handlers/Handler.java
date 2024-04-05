@@ -15,19 +15,14 @@ import service.DbService;
 import dataAccess.*;
 
 public class Handler {
+    Gson serializer = new Gson();
     private GameDAO gameDao;
     private AuthDAO authDao;
     private UserDAO userDao;
-    Gson serializer = new Gson();
-    public Handler() {
-        try{
-            this.gameDao = new MySQLGameDAO();
-            this.authDao = new MySQLAuthDAO();
-            this.userDao = new MySQLUserDAO();
-        }
-        catch(DataAccessException e){
-            System.out.println("Failed to initialize the database");
-        }
+    public Handler(GameDAO gameDao, AuthDAO authDao, UserDAO userDao) {
+        this.gameDao = gameDao;
+        this.authDao = authDao;
+        this.userDao = userDao;
     }
 
     public Object clear(Request req, Response res){

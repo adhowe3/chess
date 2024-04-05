@@ -1,5 +1,5 @@
 package server;
-import dataAccess.DataAccessException;
+import dataAccess.*;
 import handlers.Handler;
 import spark.*;
 import websocket.WebSocketHandler;
@@ -9,9 +9,20 @@ import java.net.http.WebSocket;
 public class Server {
     private Handler handler;
     private WebSocketHandler webSocketHandler;
+    private GameDAO gameDao;
+    private AuthDAO authDao;
+    private UserDAO userDao;
     public Server() {
-        handler = new Handler();
-        webSocketHandler = new WebSocketHandler();
+        try{
+            this.gameDao = new MySQLGameDAO();
+            this.authDao = new MySQLAuthDAO();
+            this.userDao = new MySQLUserDAO();
+            handler = new Handler(gameDao, authDao, userDao);
+            webSocketHandler = new WebSocketHandler(gameDao, authDao, userDao);
+        }
+        catch(DataAccessException e){
+            System.out.println("Failed to initialize the database");
+        }
     }
 
     public int run(int desiredPort) {

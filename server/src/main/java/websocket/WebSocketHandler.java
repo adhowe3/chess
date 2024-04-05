@@ -75,8 +75,8 @@ public class WebSocketHandler {
             }
         }
         catch(DataAccessException e){
-            notificationMessage = new NotificationMessage("error: " + e.getMessage());
-            connections.broadcast(auth, notificationMessage);
+            String errorMessage = new Gson().toJson(new ErrorMessage("error: " + e.getMessage()));
+            session.getRemote().sendString(errorMessage);
         }
     }
 
@@ -84,9 +84,6 @@ public class WebSocketHandler {
         ErrorMessage error;
         System.out.println("gameData id: " + gameData.getGameID());
         System.out.println("command id: " + command.getGameID());
-        if(gameData.getGameID() != command.getGameID()){
-            return new ErrorMessage("Error: bad gameID");
-        }
         if(command.getColor() == null)
         {
             return new ErrorMessage("Error: no team color");
@@ -108,7 +105,7 @@ public class WebSocketHandler {
             }
         }
         else{
-            return new LoadGameMessage(gameData);
+            return new ErrorMessage("Unknown Error");
         }
     }
 

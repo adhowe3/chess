@@ -117,8 +117,13 @@ public class WebSocketHandler {
         try{
             AuthData authData = authDao.getDataFromToken(auth);
             GameData gameData = gameDao.getGameDataFromID(command.getGameID());
-            gameData.getGame().makeMove(move);
 
+            if(!moveIsPlayersTurn(gameData, move, authData)) throw new InvalidMoveException();
+            if(isGameOver(gameData)) throw new InvalidMoveException();
+
+            gameData.getGame().makeMove(move);
+            // update the database with the move
+            gameDao.updateGame(gameData);
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s moved: %s", authData.getUsername(), move));
             connections.broadcast(auth, notificationMessage);
 
@@ -156,6 +161,25 @@ public class WebSocketHandler {
         else{
             return new ErrorMessage("Unknown Error");
         }
+    }
+
+    private boolean isGameOver(GameData gameData){
+        ChessGame game = gameData.getGame();
+        ChessGame.TeamColor currColor = game.getTeamTurn();
+        if(game.isInCheckmate(currColor) || game.isInCheckmate(game.getOppositeColor(currColor))) return true;
+        return false;
+    }
+
+    private boolean moveIsPlayersTurn(GameData gameData, ChessMove move, AuthData authData){
+        // return whether the piece that is being moved is the same color of the turn
+        ChessGame.TeamColor currTeamColor = gameData.getGame().getTeamTurn();
+        if(currTeamColor.equals(ChessGame.TeamColor.WHITE)){
+            return authData.getUsername().equals(gameData.getWhiteUsername());
+        }
+        else if(currTeamColor.equals(ChessGame.TeamColor.BLACK)){
+            return authData.getUsername().equals(gameData.getBlackUsername());
+        }
+        return false;
     }
 
 

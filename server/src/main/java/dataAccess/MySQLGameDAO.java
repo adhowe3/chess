@@ -64,6 +64,25 @@ public class MySQLGameDAO implements GameDAO{
             throw new DataAccessException("Error: cannot get gameData from gameID - " + e.getMessage());
         }
     }
+
+    @Override
+    public void updateGame(GameData data) throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "UPDATE gameTable SET game = ? WHERE gameID = ?"
+             )) {
+            String gameJson = new Gson().toJson(data.getGame());
+            preparedStatement.setString(1, gameJson);
+            preparedStatement.setInt(2, data.getGameID());
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new DataAccessException("Error: No rows updated. GameID " + data.getGameID() + " not found.");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: Failed to update gameData in database - " + e.getMessage());
+        }
+    }
+
     @Override
     public void updateWhiteUsername(int gameID, String username) throws DataAccessException{
         try (Connection connection = DatabaseManager.getConnection();

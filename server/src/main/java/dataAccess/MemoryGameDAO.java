@@ -17,6 +17,11 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
+    public void updateGame(GameData data) throws DataAccessException{
+        // not needed for Memory implementation...
+    }
+
+    @Override
     public void add(GameData data){
         this.gameData.add(data);
     }

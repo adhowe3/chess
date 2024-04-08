@@ -22,6 +22,16 @@ public class ChessGame {
     private ChessBoard gameBoard;
     private TeamColor currTeamTurn;
 
+    private boolean gameIsOver = false;
+
+    public boolean isGameIsOver() {
+        return gameIsOver;
+    }
+
+    public void setGameIsOver(boolean gameIsOver) {
+        this.gameIsOver = gameIsOver;
+    }
+
     /**
      * @return Which team's turn it is
      */

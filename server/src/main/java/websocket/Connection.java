@@ -8,9 +8,12 @@ public class Connection {
     public String authToken;
     public Session session;
 
-    public Connection(String authToken, Session session) {
+    public boolean isObserver;
+
+    public Connection(String authToken, boolean isObserver, Session session) {
         this.authToken = authToken;
         this.session = session;
+        this.isObserver = isObserver;
     }
 
     public void send(String msg) throws IOException {

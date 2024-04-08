@@ -15,12 +15,10 @@ import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinObserverCommand;
-import webSocketMessages.userCommands.JoinPlayerCommand;
-import webSocketMessages.userCommands.MakeMoveCommand;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.userCommands.*;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 
 @WebSocket
 public class WebSocketHandler {
@@ -51,15 +49,20 @@ public class WebSocketHandler {
                 MakeMoveCommand mkmCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                 makeChessMove(mkmCommand, session);
             break;
-//            case LEAVE -> ;
-//            case RESIGN -> ;
+//            case LEAVE :
+//
+//            break;
+            case RESIGN :
+                ResignCommand resignCommand = new Gson().fromJson(message, ResignCommand.class);
+                resignPlayer(resignCommand, session);
+            break;
         }
     }
 
     private void joinChessGame(JoinPlayerCommand command, Session session) throws IOException {
         String auth = command.getAuthString();
         NotificationMessage notificationMessage;
-        connections.add(auth, session);
+        connections.add(auth, false, session);
         try{
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
@@ -87,7 +90,7 @@ public class WebSocketHandler {
     private void observeChessGame(JoinObserverCommand command, Session session) throws IOException {
         String auth = command.getAuthString();
         NotificationMessage notificationMessage;
-        connections.add(auth, session);
+        connections.add(auth, true, session);
         try{
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
@@ -118,6 +121,7 @@ public class WebSocketHandler {
             AuthData authData = authDao.getDataFromToken(auth);
             GameData gameData = gameDao.getGameDataFromID(command.getGameID());
 
+            if(gameData.getGame().isGameIsOver()) throw new InvalidMoveException();
             if(!moveIsPlayersTurn(gameData, move, authData)) throw new InvalidMoveException();
             if(isGameOver(gameData)) throw new InvalidMoveException();
 
@@ -161,6 +165,32 @@ public class WebSocketHandler {
         else{
             return new ErrorMessage("Unknown Error");
         }
+    }
+
+    private void resignPlayer(ResignCommand command, Session session) throws IOException {
+        try{
+            GameData gameData = gameDao.getGameDataFromID(command.getGameID());
+            AuthData authData = authDao.getDataFromToken(command.getAuthString());
+            String name = authDao.getDataFromToken(command.getAuthString()).getUsername();
+            if(connections.isObserver(authData.getAuthToken())) {
+                String errorMessage = new Gson().toJson(new ErrorMessage("error: you are an observer"));
+                session.getRemote().sendString(errorMessage);
+                return;
+            }
+            if(gameData.getGame().isGameIsOver()){
+                String errorMessage = new Gson().toJson(new ErrorMessage("error: game is already over"));
+                session.getRemote().sendString(errorMessage);
+                return;
+            }
+            gameData.getGame().setGameIsOver(true);
+            gameDao.updateGame(gameData);
+            NotificationMessage notificationMessage = new NotificationMessage(String.format("%s resigned from the game", name));
+            connections.broadcast("", notificationMessage);
+        }catch(DataAccessException e){
+            String errorMessage = new Gson().toJson(new ErrorMessage("error: " + e.getMessage()));
+            session.getRemote().sendString(errorMessage);
+        }
+
     }
 
     private boolean isGameOver(GameData gameData){

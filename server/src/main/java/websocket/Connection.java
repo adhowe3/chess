@@ -9,11 +9,13 @@ public class Connection {
     public Session session;
 
     public boolean isObserver;
+    public boolean isWhite;
 
-    public Connection(String authToken, boolean isObserver, Session session) {
+    public Connection(String authToken, boolean isObserver, boolean isWhite, Session session) {
         this.authToken = authToken;
         this.session = session;
         this.isObserver = isObserver;
+        this.isWhite = isWhite;
     }
 
     public void send(String msg) throws IOException {

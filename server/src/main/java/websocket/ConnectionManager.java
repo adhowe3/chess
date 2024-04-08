@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String authToken, boolean isObserver, Session session) {
-        var connection = new Connection(authToken, isObserver, session);
+    public void add(String authToken, boolean isObserver, boolean isWhite, Session session) {
+        var connection = new Connection(authToken, isObserver, isWhite, session);
         connections.put(authToken, connection);
     }
 
@@ -21,8 +21,13 @@ public class ConnectionManager {
         return c.isObserver;
     }
 
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public boolean isWhite(String authToken){
+        Connection c = connections.get(authToken);
+        return c.isWhite;
+    }
+
+    public void remove(String auth) {
+        connections.remove(auth);
     }
 
     public void broadcast(String excludeJoinAuth, ServerMessage serverMessage) throws IOException {

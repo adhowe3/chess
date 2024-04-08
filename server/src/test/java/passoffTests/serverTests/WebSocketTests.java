@@ -463,7 +463,6 @@ public class WebSocketTests {
         assertNotificationMessage(messages.get(black.user));
         assertNotificationMessage(messages.get(observer.user));
 
-
         //observer leaves
         messages =
                 leave(observer.user, observer.authToken, gameID, Set.of(black.user), Set.of(white.user));

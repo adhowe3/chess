@@ -49,9 +49,10 @@ public class WebSocketHandler {
                 MakeMoveCommand mkmCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                 makeChessMove(mkmCommand, session);
             break;
-//            case LEAVE :
-//
-//            break;
+            case LEAVE :
+                LeaveGameCommand leaveCommand = new Gson().fromJson(message, LeaveGameCommand.class);
+                leaveGame(leaveCommand, session);
+            break;
             case RESIGN :
                 ResignCommand resignCommand = new Gson().fromJson(message, ResignCommand.class);
                 resignPlayer(resignCommand, session);
@@ -59,10 +60,32 @@ public class WebSocketHandler {
         }
     }
 
+    public void leaveGame(LeaveGameCommand command, Session session) throws IOException{
+        try{
+            GameData gameData = gameDao.getGameDataFromID(command.getGameID());
+            String name = authDao.getDataFromToken(command.getAuthString()).getUsername();
+
+            if(!connections.isObserver(command.getAuthString())){
+                if(connections.isWhite(command.getAuthString())){
+                    gameData.setWhiteUsername(null);
+                }
+                else gameData.setBlackUsername(null);
+            }
+            gameDao.updateGame(gameData);
+            NotificationMessage notificationMessage = new NotificationMessage(String.format("%s left the game", name));
+            connections.broadcast("", notificationMessage);
+            connections.remove(command.getAuthString());
+        }catch(DataAccessException e){
+            String errorMessage = new Gson().toJson(new ErrorMessage("error: " + e.getMessage()));
+            session.getRemote().sendString(errorMessage);
+        }
+    }
+
     private void joinChessGame(JoinPlayerCommand command, Session session) throws IOException {
         String auth = command.getAuthString();
         NotificationMessage notificationMessage;
-        connections.add(auth, false, session);
+        boolean isWhite = (command.getColor().equals(ChessGame.TeamColor.WHITE));
+        connections.add(auth, false, isWhite, session);
         try{
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
@@ -90,7 +113,7 @@ public class WebSocketHandler {
     private void observeChessGame(JoinObserverCommand command, Session session) throws IOException {
         String auth = command.getAuthString();
         NotificationMessage notificationMessage;
-        connections.add(auth, true, session);
+        connections.add(auth, true, false, session);
         try{
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();

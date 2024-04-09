@@ -28,6 +28,7 @@ public class WebSocketHandler {
     private UserDAO userDao;
     private final ConnectionManager connections = new ConnectionManager();
     public WebSocketHandler(GameDAO gameDao, AuthDAO authDao, UserDAO userDao){
+        System.out.println("WebSocketHandler constuctor");
         this.gameDao = gameDao;
         this.authDao = authDao;
         this.userDao = userDao;
@@ -38,6 +39,7 @@ public class WebSocketHandler {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         switch (command.getCommandType()) {
             case JOIN_PLAYER :
+                System.out.println("JOIN_PLAYER");
                 JoinPlayerCommand jpCommand = new Gson().fromJson(message, JoinPlayerCommand.class);
                 joinChessGame(jpCommand, session);
             break;
@@ -73,7 +75,7 @@ public class WebSocketHandler {
             }
             gameDao.updateGame(gameData);
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s left the game", name));
-            connections.broadcast("", notificationMessage);
+            connections.broadcast("", command.getGameID(), notificationMessage);
             connections.remove(command.getAuthString());
         }catch(DataAccessException e){
             String errorMessage = new Gson().toJson(new ErrorMessage("error: " + e.getMessage()));
@@ -84,8 +86,11 @@ public class WebSocketHandler {
     private void joinChessGame(JoinPlayerCommand command, Session session) throws IOException {
         String auth = command.getAuthString();
         NotificationMessage notificationMessage;
+        if(command.getColor() == null) {
+            observeChessGame(new JoinObserverCommand(command.getAuthString(), command.getGameID()), session);
+            return;
+        }
         boolean isWhite = (command.getColor().equals(ChessGame.TeamColor.WHITE));
-        connections.add(auth, false, isWhite, session);
         try{
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
@@ -95,8 +100,13 @@ public class WebSocketHandler {
 
                 // if it's not an error message, then notify all the other players that the person joined successfully
                 if(!jsonMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
+                    connections.add(auth, false, isWhite, command.getGameID(), session);
                     notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
-                    connections.broadcast(auth, notificationMessage);
+                    System.out.printf("%s joining as %s%n", name, command.getColorStr());
+                    connections.broadcast(auth, command.getGameID(), notificationMessage);
+                    String gameStr = new Gson().toJson(new LoadGameMessage(gameData.getGame()));
+                    session.getRemote().sendString(gameStr);
+                    System.out.println("gameID: " + gameData.getGameID() + "command gameID: "+ command.getGameID());
                 }
             }
             else{
@@ -113,17 +123,18 @@ public class WebSocketHandler {
     private void observeChessGame(JoinObserverCommand command, Session session) throws IOException {
         String auth = command.getAuthString();
         NotificationMessage notificationMessage;
-        connections.add(auth, true, false, session);
         try{
             if(authDao.getDataFromToken(auth) != null) {
                 String name = authDao.getDataFromToken(auth).getUsername();
                 GameData gameData = gameDao.getGameDataFromID(command.getGameID());
                 // if it's not an error message, then notify all the other players that the person joined successfully
                 if(gameData != null){
+                    connections.add(auth, true, false, command.getGameID(), session);
                     String loadGameMessage =new Gson().toJson(new LoadGameMessage(gameData.getGame()));
+//                    connections.connections.get(auth).send(loadGameMessage);
                     session.getRemote().sendString(loadGameMessage);
                     notificationMessage = new NotificationMessage(String.format("%s is observing", name));
-                    connections.broadcast(auth, notificationMessage);
+                    connections.broadcast(auth, command.getGameID(), notificationMessage);
                 }
             }
             else{
@@ -151,11 +162,13 @@ public class WebSocketHandler {
             gameData.getGame().makeMove(move);
             // update the database with the move
             gameDao.updateGame(gameData);
-            NotificationMessage notificationMessage = new NotificationMessage(String.format("%s moved: %s", authData.getUsername(), move));
-            connections.broadcast(auth, notificationMessage);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
-            connections.broadcast("", loadGameMessage);
+            connections.broadcast("", command.getGameID(), loadGameMessage);
+
+            NotificationMessage notificationMessage = new NotificationMessage(String.format("%s moved: %s", authData.getUsername(), move));
+            connections.broadcast(auth, command.getGameID(), notificationMessage);
+
 
         } catch(DataAccessException | InvalidMoveException e){
             String errorMessage = new Gson().toJson(new ErrorMessage("error: " + e.getMessage()));
@@ -208,7 +221,7 @@ public class WebSocketHandler {
             gameData.getGame().setGameIsOver(true);
             gameDao.updateGame(gameData);
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s resigned from the game", name));
-            connections.broadcast("", notificationMessage);
+            connections.broadcast("", command.getGameID(), notificationMessage);
         }catch(DataAccessException e){
             String errorMessage = new Gson().toJson(new ErrorMessage("error: " + e.getMessage()));
             session.getRemote().sendString(errorMessage);

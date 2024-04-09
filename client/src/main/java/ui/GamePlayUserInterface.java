@@ -4,6 +4,7 @@ import chess.*;
 import exception.ResponseException;
 import requests.JoinGameRequest;
 import server.ServerFacade;
+import webSocketMessages.userCommands.JoinPlayerCommand;
 import websocket.WebSocketFacade;
 
 import java.util.Scanner;
@@ -11,36 +12,23 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.SET_BG_COLOR_BLUE;
 
-public class gamePlayUserInterface {
+public class GamePlayUserInterface {
 
     private ChessGame chessGame;
-    private String playerColor;
+    private ChessGame.TeamColor playerColor;
     private String auth;
     private Boolean isPlaying = true;
-    private ServerFacade serverFacade;
 
-    private WebSocketFacade wsFacade;
 
     private Scanner scanner = new Scanner(System.in);
 
-    public gamePlayUserInterface(ServerFacade server, JoinGameRequest joinReq) throws ResponseException {
-        this.wsFacade = new WebSocketFacade(server.getServerUrl());
-        this.serverFacade = server;
-        this.playerColor = joinReq.getPlayerColor();
-        this.auth = joinReq.getAuthorization();
+    public GamePlayUserInterface(JoinPlayerCommand joinCmd) throws ResponseException {
+        this.playerColor = joinCmd.getColor();
+        this.auth = joinCmd.getAuthString();
         this.runUI();
     }
     public void runUI() throws ResponseException {
         initialPrintScreen();
-        if(playerColor == null){
-            printChessBoardToTerminalWhite();
-        }
-        else if(playerColor.equals("BLACK")){
-            printChessBoardToTerminalBlack();
-        }
-        else{
-            printChessBoardToTerminalWhite();
-        }
         while(isPlaying){
             readGamePlayCmds();
         }
@@ -173,8 +161,16 @@ public class gamePlayUserInterface {
         return pieceString;
     }
 
-    private void printChessBoardToTerminalBlack(){
-        ChessBoard board = this.chessGame.getBoard();
+    public void printChessBoard(ChessBoard board){
+        System.out.println("printChessBoard");
+        if(this.playerColor == null) printChessBoardToTerminalWhite(board);
+        if(this.playerColor.equals(ChessGame.TeamColor.BLACK)){
+            printChessBoardToTerminalBlack(board);
+        }
+        else printChessBoardToTerminalWhite(board);
+    }
+
+    private void printChessBoardToTerminalBlack(ChessBoard board){
         String spacing = "\u2001\u2005\u2006";
         String backgroundColor = SET_BG_COLOR_LIGHT_GREY;
         String[] backwardLetters ={(" h"+spacing), (" g"+spacing), (" f"+spacing), (" e"+spacing), (" d"+spacing), (" c"+spacing), (" b"+spacing), " a\u2005"};
@@ -202,8 +198,7 @@ public class gamePlayUserInterface {
         System.out.println(EMPTY  + SET_BG_COLOR_DARK_GREY);
     }
 
-    private void printChessBoardToTerminalWhite(){
-        ChessBoard board = this.chessGame.getBoard();
+    private void printChessBoardToTerminalWhite(ChessBoard board){
         String spacing = "\u2001\u2005\u2006";
         String backgroundColor = SET_BG_COLOR_LIGHT_GREY;
         String[] forwardLetters ={(" a"+spacing), (" b"+spacing), (" c"+spacing), (" d"+spacing), (" e"+spacing), (" f"+spacing), (" g"+spacing), " h\u2005"};

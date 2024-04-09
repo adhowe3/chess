@@ -35,6 +35,7 @@ public class JoinGameRequest {
     }
 
     public void setPlayerColor(String color){
+        if(color == null) return;
         if(color.equals("WHITE") || color.equals("BLACK")){
             this.playerColor = color;
         }

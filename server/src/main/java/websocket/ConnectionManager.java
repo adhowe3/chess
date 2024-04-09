@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String authToken, boolean isObserver, boolean isWhite, Session session) {
-        var connection = new Connection(authToken, isObserver, isWhite, session);
+    public void add(String authToken, boolean isObserver, boolean isWhite, Integer lobby, Session session) {
+        var connection = new Connection(authToken, isObserver, isWhite, lobby, session);
         connections.put(authToken, connection);
     }
 
@@ -30,11 +30,13 @@ public class ConnectionManager {
         connections.remove(auth);
     }
 
-    public void broadcast(String excludeJoinAuth, ServerMessage serverMessage) throws IOException {
+    public void broadcast(String excludeJoinAuth, Integer lobby, ServerMessage serverMessage) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
-            if (c.session.isOpen()) {
+            System.out.println("is open: " + c.session.isOpen() + "c.lobby: " + c.lobby );
+            if (c.session.isOpen() && c.lobby.equals(lobby)) {
                 if (!c.authToken.equals(excludeJoinAuth)) {
+                    System.out.println("sending broadcast message");
                     c.send(new Gson().toJson(serverMessage));
                 }
             } else {

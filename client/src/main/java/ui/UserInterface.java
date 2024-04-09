@@ -1,9 +1,5 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import exception.ResponseException;
 import model.*;
 import requests.CreateGameRequest;
@@ -26,8 +22,6 @@ public class UserInterface {
     private boolean isInGamePlay = false;
     private boolean exit = false;
     private String authToken;
-
-    private gamePlayUserInterface gamePlayUI;
 
     private List<GameData> gameDataList = new ArrayList<GameData>();
     public UserInterface(String serverUrl) throws ResponseException {
@@ -136,7 +130,6 @@ public class UserInterface {
                 if(joinReq != null) {
                     try {
                         server.joinGame(joinReq);
-                        gamePlayUI = new gamePlayUserInterface(server, joinReq);
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -150,7 +143,6 @@ public class UserInterface {
                 if(observeReq != null) {
                     try {
                         server.joinGame(observeReq);
-                        gamePlayUI = new gamePlayUserInterface(server, observeReq);
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -200,7 +192,8 @@ public class UserInterface {
             return null;
         }
         if(userIn.length > 2){
-            userColor = userIn[2];
+            if(userIn[2].equals("WHITE") || userIn[2].equals("BLACK"))
+                userColor = userIn[2];
         }
         req.setPlayerColor(userColor);
         return req;

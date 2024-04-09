@@ -31,6 +31,7 @@ public class UserInterface implements NotificationHandler {
 
     private ChessGame.TeamColor playerColor;
     private boolean exit = false;
+    private boolean isObserver = false;
     private String authToken;
     private Integer gameID;
 
@@ -47,19 +48,19 @@ public class UserInterface implements NotificationHandler {
         ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
         switch(serverMessage.getServerMessageType()){
             case NOTIFICATION :
-                System.out.println("NOTIFICATION");
+                System.out.println();
                 NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
                 System.out.println(SET_TEXT_COLOR_YELLOW + notification.getMessage() + SET_TEXT_COLOR_WHITE);
                 printUserTerminal();
                 break;
             case LOAD_GAME:
-                System.out.println("LOAD_GAME");
+                System.out.println();
                 LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
                 printChessBoard(loadGame.getGame().getBoard());
                 printUserTerminal();
                 break;
             case ERROR:
-                System.out.println("ERROR");
+                System.out.println();
                 ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
                 System.out.println(SET_TEXT_COLOR_RED + errorMessage.getErrorMessage() + SET_TEXT_COLOR_WHITE);
                 printUserTerminal();
@@ -97,8 +98,11 @@ public class UserInterface implements NotificationHandler {
     }
 
     private void printUserTerminal(){
-        if(isInGamePlay){
+        if(isInGamePlay && !isObserver){
             System.out.print("[PLAYING_GAME] >>> ");
+        }
+        else if(isInGamePlay && isObserver){
+            System.out.print("[OBSERVING_GAME] >>> ");
         }
         else if(isLoggedin){
             System.out.print("[LOGGED_IN] >>> ");
@@ -126,7 +130,7 @@ public class UserInterface implements NotificationHandler {
     }
 
     public void readGamePlayCmds() {
-        System.out.print("[PLAYING_GAME] >>> ");
+        printUserTerminal();
         String userInput[] = readCommand();
         switch(userInput[0]) {
             case ("help"):
@@ -154,6 +158,7 @@ public class UserInterface implements NotificationHandler {
                     wsFacade.leaveChessGame(authToken, gameID);
                     System.out.println("Leaving game");
                     isInGamePlay = false;
+                    isObserver = false;
                 }catch(ResponseException e){
                     System.out.println(e.getMessage());
                 }
@@ -183,7 +188,7 @@ public class UserInterface implements NotificationHandler {
                                 if (game.getGameID() == gameID) {
                                     this.gameData = game;
                                     Collection<ChessMove> validMoves = this.gameData.getGame().validMoves(pos);
-                                    System.out.println("validMoves: " + validMoves);
+                                    printChessBoardHighlight(gameData.getGame().getBoard(), validMoves);
                                 }
                             }
                         }catch(ResponseException e){
@@ -336,6 +341,7 @@ public class UserInterface implements NotificationHandler {
                     try {
                         server.joinGame(observeReq);
                         isInGamePlay = true;
+                        isObserver = true;
                         this.wsFacade = new WebSocketFacade(server.getServerUrl(), this);
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
@@ -422,9 +428,97 @@ public class UserInterface implements NotificationHandler {
         return new JoinGameRequest(authToken, null, gameID, gameListNum);
     }
 
+    private void printChessBoardHighlight(ChessBoard board, Collection<ChessMove> validMoves){
+        if(playerColor == null){
+            printChessBoardHighlightWhite(board, validMoves);
+        }
+        else if(playerColor.equals(ChessGame.TeamColor.BLACK)){
+            printChessBoardHighlightBlack(board, validMoves);
+        }
+        else {
+            printChessBoardHighlightWhite(board, validMoves);
+        }
+    }
+
+    private void printChessBoardHighlightWhite(ChessBoard board, Collection<ChessMove> validMoves){
+        Collection<ChessPosition> validPositions = new ArrayList<>();
+        for(ChessMove move : validMoves){
+            validPositions.add(move.getEndPosition());
+            validPositions.add(move.getStartPosition());
+        }
+        String spacing = "\u2001\u2005\u2006";
+        String backgroundColor = SET_BG_COLOR_DARK_GREY;
+        String[] forwardLetters ={(" a"+spacing), (" b"+spacing), (" c"+spacing), (" d"+spacing), (" e"+spacing), (" f"+spacing), (" g"+spacing), " h\u2005"};
+
+        System.out.print(SET_BG_COLOR_BLACK + EMPTY);
+        for(int i = 0; i < 8; i++){
+            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + forwardLetters[i]);
+        }
+        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
+        System.out.print(SET_BG_COLOR_BLACK + " 8 ");
+
+        for(int row = 8; row >= 1; row--){
+            for(int col = 8; col >= 1; col--){
+                if(validPositions.contains(new ChessPosition(row, col))){
+                    printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
+                }
+                else{
+                    printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
+                }
+                backgroundColor = flipBgColor(backgroundColor);
+            }
+            System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);
+            if(row > 1) System.out.print(SET_BG_COLOR_BLACK+ " " + (row-1) + " ");
+            backgroundColor = flipBgColor(backgroundColor);
+        }
+        System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + EMPTY);
+        for(int i = 0; i < 8; i++){
+            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + forwardLetters[i]);
+        }
+        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
+    }
+
+    private void printChessBoardHighlightBlack(ChessBoard board, Collection<ChessMove> validMoves){
+        Collection<ChessPosition> validPositions = new ArrayList<>();
+        for(ChessMove move : validMoves){
+            validPositions.add(move.getEndPosition());
+            validPositions.add(move.getStartPosition());
+        }
+        String spacing = "\u2001\u2005\u2006";
+        String backgroundColor = SET_BG_COLOR_DARK_GREY;
+        String[] backwardLetters ={(" h"+spacing), (" g"+spacing), (" f"+spacing), (" e"+spacing), (" d"+spacing), (" c"+spacing), (" b"+spacing), " a\u2005"};
+        System.out.print(SET_BG_COLOR_BLACK + EMPTY);
+        for(int i = 0; i < 8; i++){
+            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + backwardLetters[i]);
+        }
+        System.out.println(EMPTY + SET_BG_COLOR_DARK_GREY);
+        System.out.print(SET_BG_COLOR_BLACK + " 1 ");
+
+        for(int row = 1; row < 9; row++){
+            for(int col = 1; col < 9; col++){
+                if(validPositions.contains(new ChessPosition(row, col))){
+                    printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
+                }
+                else{
+                    printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
+                }
+                backgroundColor = flipBgColor(backgroundColor);
+            }
+            System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);
+            if(row < 8) System.out.print(SET_BG_COLOR_BLACK+ " " + (row+1) + " ");
+            backgroundColor = flipBgColor(backgroundColor);
+        }
+
+        System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + EMPTY);
+        for(int i = 0; i < 8; i++){
+            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + backwardLetters[i]);
+        }
+        System.out.println(EMPTY  + SET_BG_COLOR_DARK_GREY);
+    }
+
     private void printChessBoardToTerminalBlack(ChessBoard board){
         String spacing = "\u2001\u2005\u2006";
-        String backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+        String backgroundColor = SET_BG_COLOR_DARK_GREY;
         String[] backwardLetters ={(" h"+spacing), (" g"+spacing), (" f"+spacing), (" e"+spacing), (" d"+spacing), (" c"+spacing), (" b"+spacing), " a\u2005"};
         System.out.print(SET_BG_COLOR_BLACK + EMPTY);
         for(int i = 0; i < 8; i++){
@@ -452,7 +546,7 @@ public class UserInterface implements NotificationHandler {
 
     private void printChessBoardToTerminalWhite(ChessBoard board){
         String spacing = "\u2001\u2005\u2006";
-        String backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+        String backgroundColor = SET_BG_COLOR_DARK_GREY;
         String[] forwardLetters ={(" a"+spacing), (" b"+spacing), (" c"+spacing), (" d"+spacing), (" e"+spacing), (" f"+spacing), (" g"+spacing), " h\u2005"};
 
         System.out.print(SET_BG_COLOR_BLACK + EMPTY);
@@ -506,12 +600,22 @@ public class UserInterface implements NotificationHandler {
         }
         return pieceString;
     }
+    
+    private String setHighlightColor(String currColor){
+        if(currColor.equals(SET_BG_COLOR_LIGHT_GREY)){
+            return SET_BG_COLOR_GREEN;
+        }
+        if(currColor.equals(SET_BG_COLOR_DARK_GREY)){
+            return SET_BG_COLOR_DARK_GREEN;
+        }
+        return SET_BG_COLOR_BLUE;
+    }
 
     private String flipBgColor(String currColor){
         if(currColor.equals(SET_BG_COLOR_LIGHT_GREY)){
-            return SET_BG_COLOR_RED;
+            return SET_BG_COLOR_DARK_GREY;
         }
-        if(currColor.equals(SET_BG_COLOR_RED)){
+        if(currColor.equals(SET_BG_COLOR_DARK_GREY)){
             return SET_BG_COLOR_LIGHT_GREY;
         }
         // error case

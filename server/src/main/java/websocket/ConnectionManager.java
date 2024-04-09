@@ -18,6 +18,7 @@ public class ConnectionManager {
 
     public boolean isObserver(String authToken){
         Connection c = connections.get(authToken);
+        if(c == null) return false;
         return c.isObserver;
     }
 

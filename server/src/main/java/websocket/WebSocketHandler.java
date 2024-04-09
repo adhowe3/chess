@@ -160,21 +160,21 @@ public class WebSocketHandler {
             AuthData authData = authDao.getDataFromToken(auth);
             GameData gameData = gameDao.getGameDataFromID(command.getGameID());
 
-            if(gameData.getGame().isGameIsOver()) throw new InvalidMoveException();
-            if(!moveIsPlayersTurn(gameData, move, authData)) throw new InvalidMoveException();
-            if(isGameOver(gameData)) throw new InvalidMoveException();
+            if(connections.isObserver(authData.getAuthToken())) throw new InvalidMoveException("You are observing");
+            if(gameData.getGame().isGameIsOver()) throw new InvalidMoveException("Game is over");
+            if(!moveIsPlayersTurn(gameData, move, authData)) throw new InvalidMoveException("Not your turn");
+            if(isGameOver(gameData)) throw new InvalidMoveException("__ Game is over __");
 
             gameData.getGame().makeMove(move);
             // update the database with the move
             gameDao.updateGame(gameData);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
-            connections.broadcast(auth, command.getGameID(), loadGameMessage);
+            connections.broadcast("", command.getGameID(), loadGameMessage);
             System.out.println("broadcasting loadGameMessage from makeMove");
 
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s moved: %s", authData.getUsername(), move));
             connections.broadcast(auth, command.getGameID(), notificationMessage);
-
 
         } catch(DataAccessException | InvalidMoveException e){
             String errorMessage = new Gson().toJson(new ErrorMessage("error: " + e.getMessage()));

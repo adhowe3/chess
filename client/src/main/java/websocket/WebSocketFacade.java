@@ -1,14 +1,9 @@
 package websocket;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import webSocketMessages.serverMessages.LoadGameMessage;
-import webSocketMessages.serverMessages.NotificationMessage;
-import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.LeaveGameCommand;
 import webSocketMessages.userCommands.MakeMoveCommand;

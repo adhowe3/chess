@@ -7,7 +7,6 @@ import java.io.IOException;
 public class Connection {
     public String authToken;
     public Session session;
-
     public boolean isObserver;
     public boolean isWhite;
     public Integer lobby;

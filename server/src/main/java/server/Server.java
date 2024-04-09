@@ -4,8 +4,6 @@ import handlers.Handler;
 import spark.*;
 import websocket.WebSocketHandler;
 
-import java.net.http.WebSocket;
-
 public class Server {
     private Handler handler;
     private WebSocketHandler webSocketHandler;

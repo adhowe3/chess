@@ -1,18 +1,22 @@
 package server;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import model.*;
+import model.AuthData;
+import model.UserData;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import requests.LoginRequest;
 import responses.CreateGameResponse;
 import responses.ListGamesResponse;
-import websocket.WebSocketFacade;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 
 public class ServerFacade {
 

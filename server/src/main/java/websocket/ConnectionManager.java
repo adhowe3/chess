@@ -33,7 +33,7 @@ public class ConnectionManager {
     public void broadcast(String excludeJoinAuth, Integer lobby, ServerMessage serverMessage) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
-            System.out.println("is open: " + c.session.isOpen() + "c.lobby: " + c.lobby );
+            System.out.println("lobby: "+ lobby + "c.lobby: " + c.lobby );
             if (c.session.isOpen() && c.lobby.equals(lobby)) {
                 if (!c.authToken.equals(excludeJoinAuth)) {
                     System.out.println("sending broadcast message");

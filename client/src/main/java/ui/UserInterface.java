@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import requests.CreateGameRequest;
@@ -8,6 +9,7 @@ import requests.LoginRequest;
 import responses.CreateGameResponse;
 import responses.ListGamesResponse;
 import server.ServerFacade;
+import websocket.WebSocketFacade;
 
 import java.util.*;
 
@@ -22,9 +24,12 @@ public class UserInterface {
     private boolean isInGamePlay = false;
     private boolean exit = false;
     private String authToken;
+    private GamePlayUserInterface gamePlayUserInterface;
+    private WebSocketFacade wsFacade;
 
     private List<GameData> gameDataList = new ArrayList<GameData>();
     public UserInterface(String serverUrl) throws ResponseException {
+        wsFacade = new WebSocketFacade(serverUrl, gamePlayUserInterface);
         server = new ServerFacade(serverUrl);
     }
 
@@ -32,6 +37,10 @@ public class UserInterface {
         System.out.println(SET_TEXT_COLOR_WHITE + WHITE_KING + "Welcome to 240 chess. Type help to get started." + WHITE_KING);
         readPreLoginCmds();
         while(!exit){
+            if(isInGamePlay){
+                isInGamePlay = gamePlayUserInterface.getIsPlaying();
+                continue;
+            }
             if(!isLoggedin){
                 readPreLoginCmds();
             }
@@ -130,6 +139,11 @@ public class UserInterface {
                 if(joinReq != null) {
                     try {
                         server.joinGame(joinReq);
+                        gamePlayUserInterface = new GamePlayUserInterface(joinReq);
+                        this.wsFacade = new WebSocketFacade(server.getServerUrl(), gamePlayUserInterface);
+                        gamePlayUserInterface.setWsFacade(wsFacade);
+                        this.wsFacade.joinChessGame(joinReq.getAuthorization(), strToTeamColor(joinReq.getPlayerColor()), joinReq.getgameID());
+                        isInGamePlay = true;
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -143,6 +157,10 @@ public class UserInterface {
                 if(observeReq != null) {
                     try {
                         server.joinGame(observeReq);
+                        isInGamePlay = true;
+                        gamePlayUserInterface = new GamePlayUserInterface(observeReq);
+                        this.wsFacade = new WebSocketFacade(server.getServerUrl(), gamePlayUserInterface);
+                        gamePlayUserInterface.setWsFacade(wsFacade);
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }
@@ -169,6 +187,14 @@ public class UserInterface {
                 System.out.println("Not a recognized command");
                 break;
         }
+    }
+
+    private ChessGame.TeamColor strToTeamColor(String color){
+        if(color == null) return null;
+        if(color.equals("BLACK")){
+            return ChessGame.TeamColor.BLACK;
+        }
+        else return ChessGame.TeamColor.WHITE;
     }
 
     private Map<Integer, Integer> gameIDMap = new HashMap<>();

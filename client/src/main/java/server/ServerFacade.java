@@ -17,11 +17,9 @@ import java.net.*;
 public class ServerFacade {
 
     private final String serverUrl;
-    private WebSocketFacade wsFacade;
 
     public ServerFacade(String url) throws ResponseException {
         serverUrl = url;
-        this.wsFacade = new WebSocketFacade(url);
     }
 
     public String getServerUrl() {
@@ -56,16 +54,6 @@ public class ServerFacade {
     public void joinGame(JoinGameRequest join) throws ResponseException{
         var path = "/game";
         this.makeRequest("PUT", path, join, join.getAuthorization(), null);
-        wsFacade = new WebSocketFacade(serverUrl);
-        wsFacade.joinChessGame(join.getAuthorization(), strToTeamColor(join.getPlayerColor()), join.getgameID());
-    }
-
-    private ChessGame.TeamColor strToTeamColor(String color){
-        if(color == null) return null;
-        if(color.equals("BLACK")){
-            return ChessGame.TeamColor.BLACK;
-        }
-        else return ChessGame.TeamColor.WHITE;
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authorizationHeader, Class<T> responseClass) throws ResponseException {
@@ -88,7 +76,6 @@ public class ServerFacade {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {

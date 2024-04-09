@@ -14,20 +14,30 @@ import static ui.EscapeSequences.SET_BG_COLOR_BLUE;
 
 public class GamePlayUserInterface {
 
+    private Integer gameID;
+    private WebSocketFacade wsFacade;
     private ChessGame chessGame;
     private ChessGame.TeamColor playerColor;
     private String auth;
     private Boolean isPlaying = true;
 
-
     private Scanner scanner = new Scanner(System.in);
 
-    public GamePlayUserInterface(JoinPlayerCommand joinCmd) throws ResponseException {
-        this.playerColor = joinCmd.getColor();
-        this.auth = joinCmd.getAuthString();
-        this.runUI();
+    public GamePlayUserInterface(JoinGameRequest joinReq) throws ResponseException {
+        if(joinReq.getPlayerColor() == null) playerColor = null;
+        if(joinReq.getPlayerColor().equals("WHITE")){
+            playerColor = ChessGame.TeamColor.WHITE;
+        }
+        else playerColor = ChessGame.TeamColor.BLACK;
+        this.auth = joinReq.getAuthorization();
+        this.gameID = joinReq.getgameID();
     }
-    public void runUI() throws ResponseException {
+
+    public void setWsFacade(WebSocketFacade wsFacade) {
+        this.wsFacade = wsFacade;
+    }
+
+    public void runUI(){
         initialPrintScreen();
         while(isPlaying){
             readGamePlayCmds();
@@ -48,7 +58,7 @@ public class GamePlayUserInterface {
         return input.split("\\s+");
     }
 
-    private void readGamePlayCmds() throws ResponseException {
+    private void readGamePlayCmds() {
         System.out.print("[PLAYING_GAME] >>> ");
         String userInput[] = readCommand();
         switch(userInput[0]) {
@@ -68,7 +78,12 @@ public class GamePlayUserInterface {
                 break;
             case ("leave"):
                     isPlaying = false;
-                    System.out.println("Leaving game: ");
+                    try{
+                        wsFacade.leaveChessGame(auth, gameID);
+                        System.out.println("Leaving game");
+                    }catch(ResponseException e){
+                        System.out.println(e.getMessage());
+                    }
                 break;
             case ("move"):
                 try{
@@ -235,6 +250,10 @@ public class GamePlayUserInterface {
         }
         // error case
         return SET_BG_COLOR_BLUE;
+    }
+
+    public boolean getIsPlaying(){
+        return isPlaying;
     }
 
     @Override

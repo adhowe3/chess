@@ -4,6 +4,7 @@ import chess.*;
 import exception.ResponseException;
 import requests.JoinGameRequest;
 import server.ServerFacade;
+import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import websocket.WebSocketFacade;
 
@@ -21,6 +22,8 @@ public class GamePlayUserInterface {
     private String auth;
     private Boolean isPlaying = true;
 
+    private Boolean beginReadingCommands = false;
+
     private Scanner scanner = new Scanner(System.in);
 
     public GamePlayUserInterface(JoinGameRequest joinReq) throws ResponseException {
@@ -33,6 +36,10 @@ public class GamePlayUserInterface {
         this.gameID = joinReq.getgameID();
     }
 
+    public void setBeginReadingCommands(Boolean val){
+        beginReadingCommands = val;
+    }
+
     public void setWsFacade(WebSocketFacade wsFacade) {
         this.wsFacade = wsFacade;
     }
@@ -40,7 +47,8 @@ public class GamePlayUserInterface {
     public void runUI(){
         initialPrintScreen();
         while(isPlaying){
-            readGamePlayCmds();
+            if(beginReadingCommands)
+                readGamePlayCmds();
         }
     }
 
@@ -53,12 +61,13 @@ public class GamePlayUserInterface {
     }
 
     private String[] readCommand(){
-        while(!scanner.hasNext()){}
+        while(!scanner.hasNext()){
+        }
         String input = scanner.nextLine();
         return input.split("\\s+");
     }
 
-    private void readGamePlayCmds() {
+    public void readGamePlayCmds() {
         System.out.print("[PLAYING_GAME] >>> ");
         String userInput[] = readCommand();
         switch(userInput[0]) {

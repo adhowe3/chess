@@ -44,18 +44,22 @@ public class WebSocketHandler {
                 joinChessGame(jpCommand, session);
             break;
             case JOIN_OBSERVER:
+                System.out.println("JOIN_OBSERVER");
                 JoinObserverCommand obsCommand = new Gson().fromJson(message, JoinObserverCommand.class);
                 observeChessGame(obsCommand, session);
             break;
             case MAKE_MOVE:
+                System.out.println("MAKE_MOVE");
                 MakeMoveCommand mkmCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                 makeChessMove(mkmCommand, session);
             break;
             case LEAVE :
+                System.out.println("LEAVE");
                 LeaveGameCommand leaveCommand = new Gson().fromJson(message, LeaveGameCommand.class);
                 leaveGame(leaveCommand, session);
             break;
             case RESIGN :
+                System.out.println("RESIGN");
                 ResignCommand resignCommand = new Gson().fromJson(message, ResignCommand.class);
                 resignPlayer(resignCommand, session);
             break;
@@ -75,6 +79,7 @@ public class WebSocketHandler {
             }
             gameDao.updateGame(gameData);
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s left the game", name));
+            System.out.println(String.format("%s left the game", name));
             connections.broadcast("", command.getGameID(), notificationMessage);
             connections.remove(command.getAuthString());
         }catch(DataAccessException e){
@@ -104,9 +109,9 @@ public class WebSocketHandler {
                     notificationMessage = new NotificationMessage(String.format("%s joining as %s", name, command.getColorStr()));
                     System.out.printf("%s joining as %s%n", name, command.getColorStr());
                     connections.broadcast(auth, command.getGameID(), notificationMessage);
-                    String gameStr = new Gson().toJson(new LoadGameMessage(gameData.getGame()));
-                    session.getRemote().sendString(gameStr);
-                    System.out.println("gameID: " + gameData.getGameID() + "command gameID: "+ command.getGameID());
+//                    String gameStr = new Gson().toJson(new LoadGameMessage(gameData.getGame()));
+//                    session.getRemote().sendString(gameStr);
+                    System.out.println("sending loadGameMessage from joinChessGame");
                 }
             }
             else{
@@ -131,8 +136,8 @@ public class WebSocketHandler {
                 if(gameData != null){
                     connections.add(auth, true, false, command.getGameID(), session);
                     String loadGameMessage =new Gson().toJson(new LoadGameMessage(gameData.getGame()));
-//                    connections.connections.get(auth).send(loadGameMessage);
                     session.getRemote().sendString(loadGameMessage);
+                    System.out.println("broadcasting loadGameMessage from observeChessGame");
                     notificationMessage = new NotificationMessage(String.format("%s is observing", name));
                     connections.broadcast(auth, command.getGameID(), notificationMessage);
                 }
@@ -164,7 +169,8 @@ public class WebSocketHandler {
             gameDao.updateGame(gameData);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
-            connections.broadcast("", command.getGameID(), loadGameMessage);
+            connections.broadcast(auth, command.getGameID(), loadGameMessage);
+            System.out.println("broadcasting loadGameMessage from makeMove");
 
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s moved: %s", authData.getUsername(), move));
             connections.broadcast(auth, command.getGameID(), notificationMessage);

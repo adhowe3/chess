@@ -20,14 +20,19 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
 
     Session session;
-    GamePlayUserInterface gamePlayUserInterface;
 
-    public WebSocketFacade(String url, GamePlayUserInterface gamePlayUserInterface) throws ResponseException {
-        this.gamePlayUserInterface = gamePlayUserInterface;
+    boolean hasNewMessage = false;
+
+    NotificationHandler notificationHandler;
+
+    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
+
         System.out.println("websocketfacade constructor");
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/connect");
+
+            this.notificationHandler = notificationHandler;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -36,21 +41,22 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    System.out.println("serverMessage");
-                    switch (serverMessage.getServerMessageType()) {
-                        case LOAD_GAME:
-                            LoadGameMessage lgMessage = new Gson().fromJson(message, LoadGameMessage.class);
-                            loadGame(lgMessage);
-                            System.out.println("LOAD_GAME");
-                            break;
-                        case NOTIFICATION:
-                            System.out.println("NOTIFICATION");
-                            break;
-                        case ERROR:
-                            System.out.println("ERROR");
-                            break;
-                    }
+                    notificationHandler.notify(message);
+//                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+//                    System.out.println("serverMessage");
+//                    switch (serverMessage.getServerMessageType()) {
+//                        case LOAD_GAME:
+//                            System.out.println("LOAD_GAME");
+//                            LoadGameMessage lgMessage = new Gson().fromJson(message, LoadGameMessage.class);
+//                            loadGame(lgMessage);
+//                            break;
+//                        case NOTIFICATION:
+//                            System.out.println("NOTIFICATION");
+//                            break;
+//                        case ERROR:
+//                            System.out.println("ERROR");
+//                            break;
+//                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -86,7 +92,13 @@ public class WebSocketFacade extends Endpoint {
     private void loadGame(LoadGameMessage message){
         System.out.println("loadGame called");
         ChessBoard board = message.getGame().getBoard();
-        gamePlayUserInterface.printChessBoard(board);
-        gamePlayUserInterface.runUI();
+    }
+
+    public boolean hasNewMessage(){
+        if(hasNewMessage){
+            hasNewMessage = false;
+            return true;
+        }
+        else return false;
     }
 }

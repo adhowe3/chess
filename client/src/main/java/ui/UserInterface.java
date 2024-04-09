@@ -479,10 +479,10 @@ public class UserInterface implements NotificationHandler {
     }
 
     private void printChessBoardHighlightBlack(ChessBoard board, Collection<ChessMove> validMoves){
-        Collection<ChessPosition> validPositions = new ArrayList<>();
+        Collection<ChessPosition> validPos = new ArrayList<>();
         for(ChessMove move : validMoves){
-            validPositions.add(move.getEndPosition());
-            validPositions.add(move.getStartPosition());
+            validPos.add(move.getEndPosition());
+            validPos.add(move.getStartPosition());
         }
         String spacing = "\u2001\u2005\u2006";
         String backgroundColor = SET_BG_COLOR_DARK_GREY;

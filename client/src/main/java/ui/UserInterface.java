@@ -33,7 +33,8 @@ public class UserInterface implements NotificationHandler {
     private boolean exit = false;
     private String authToken;
     private Integer gameID;
-    private GamePlayUserInterface gamePlayUserInterface;
+
+    private GameData gameData;
     private WebSocketFacade wsFacade;
 
     private List<GameData> gameDataList = new ArrayList<GameData>();
@@ -137,7 +138,13 @@ public class UserInterface implements NotificationHandler {
                 break;
             case ("redraw"):
                 try{
-
+                    ArrayList<GameData> lsGames = server.listGames(authToken).games();
+                    for(GameData game : lsGames){
+                        if(game.getGameID() == gameID){
+                            this.gameData = game;
+                            printChessBoard(gameData.getGame().getBoard());
+                        }
+                    }
                 }catch(Exception e){
                     System.out.println(e.getMessage());
                 }
@@ -167,6 +174,23 @@ public class UserInterface implements NotificationHandler {
                 }
                 break;
             case("highlight"):
+                if(userInput.length > 1){
+                    ChessPosition pos = getPositionFromString(userInput[1]);
+                    if(pos != null){
+                        try {
+                            ArrayList<GameData> lsGames = server.listGames(authToken).games();
+                            for (GameData game : lsGames) {
+                                if (game.getGameID() == gameID) {
+                                    this.gameData = game;
+                                    Collection<ChessMove> validMoves = this.gameData.getGame().validMoves(pos);
+                                    System.out.println("validMoves: " + validMoves);
+                                }
+                            }
+                        }catch(ResponseException e){
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                }
                 break;
             default:
                 System.out.println("Not a recognized command");
@@ -188,8 +212,9 @@ public class UserInterface implements NotificationHandler {
     private ChessPosition getPositionFromString(String str){
         if(str.length() < 2) return null;
         str = str.toLowerCase(Locale.ROOT);
-        int col = str.charAt(0) - 'a' + 1;
+        int col = 8 - (str.charAt(0) - 'a');
         int row = str.charAt(1) - '0';
+        if(row > 8 || col > 8) return null;
         System.out.println("col: " + col);
         System.out.println("row: " + row);
         return new ChessPosition(row, col);

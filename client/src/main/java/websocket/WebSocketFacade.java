@@ -2,6 +2,7 @@ package websocket;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -11,6 +12,8 @@ import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.LeaveGameCommand;
+import webSocketMessages.userCommands.MakeMoveCommand;
+import webSocketMessages.userCommands.ResignCommand;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -42,21 +45,6 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     notificationHandler.notify(message);
-//                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-//                    System.out.println("serverMessage");
-//                    switch (serverMessage.getServerMessageType()) {
-//                        case LOAD_GAME:
-//                            System.out.println("LOAD_GAME");
-//                            LoadGameMessage lgMessage = new Gson().fromJson(message, LoadGameMessage.class);
-//                            loadGame(lgMessage);
-//                            break;
-//                        case NOTIFICATION:
-//                            System.out.println("NOTIFICATION");
-//                            break;
-//                        case ERROR:
-//                            System.out.println("ERROR");
-//                            break;
-//                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -88,17 +76,23 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
-    private void loadGame(LoadGameMessage message){
-        System.out.println("loadGame called");
-        ChessBoard board = message.getGame().getBoard();
+    public void resign(String authToken, Integer gameID) throws ResponseException{
+        try {
+            System.out.println("resign");
+            var command = new ResignCommand(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
     }
 
-    public boolean hasNewMessage(){
-        if(hasNewMessage){
-            hasNewMessage = false;
-            return true;
+    public void makeMove(String authToken, ChessMove move, Integer gameID) throws ResponseException{
+        try {
+            System.out.println("makeMove");
+            var command = new MakeMoveCommand(authToken, move, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
         }
-        else return false;
     }
 }

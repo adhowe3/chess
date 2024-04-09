@@ -10,6 +10,7 @@ import requests.LoginRequest;
 import responses.CreateGameResponse;
 import responses.ListGamesResponse;
 import server.ServerFacade;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
@@ -47,7 +48,7 @@ public class UserInterface implements NotificationHandler {
             case NOTIFICATION :
                 System.out.println("NOTIFICATION");
                 NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
-                System.out.println(SET_TEXT_COLOR_RED + notification.getMessage() + SET_TEXT_COLOR_WHITE);
+                System.out.println(SET_TEXT_COLOR_YELLOW + notification.getMessage() + SET_TEXT_COLOR_WHITE);
                 printUserTerminal();
                 break;
             case LOAD_GAME:
@@ -58,6 +59,8 @@ public class UserInterface implements NotificationHandler {
                 break;
             case ERROR:
                 System.out.println("ERROR");
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println(SET_TEXT_COLOR_RED + errorMessage.getErrorMessage() + SET_TEXT_COLOR_WHITE);
                 printUserTerminal();
                 break;
         }
@@ -151,13 +154,17 @@ public class UserInterface implements NotificationHandler {
             case ("move"):
                 try{
                     ChessMove move = getMoveFromCommand(userInput);
-                    // ws makeMove()
+                    wsFacade.makeMove(authToken, move, gameID);
                 }catch(Exception e){
                     System.out.println(e.getMessage());
                 }
                 break;
             case("resign"):
-
+                try{
+                    wsFacade.resign(authToken, gameID);
+                }catch(Exception e){
+                    System.out.println(e.getMessage());
+                }
                 break;
             case("highlight"):
                 break;
@@ -168,9 +175,11 @@ public class UserInterface implements NotificationHandler {
     }
 
     private ChessMove getMoveFromCommand(String[] userInput){
-        if(userInput.length > 3){
+        if(userInput.length >= 3){
             String from = userInput[1];
             String to = userInput[2];
+            System.out.println("from: " + userInput[1]);
+            System.out.println("to: " + userInput[2]);
             return new ChessMove(getPositionFromString(from), getPositionFromString(to));
         }
         else return null;
@@ -178,8 +187,11 @@ public class UserInterface implements NotificationHandler {
 
     private ChessPosition getPositionFromString(String str){
         if(str.length() < 2) return null;
-        int col = str.charAt(0) - 'a';
-        int row = str.charAt(1);
+        str = str.toLowerCase(Locale.ROOT);
+        int col = str.charAt(0) - 'a' + 1;
+        int row = str.charAt(1) - '0';
+        System.out.println("col: " + col);
+        System.out.println("row: " + row);
         return new ChessPosition(row, col);
     }
 

@@ -69,11 +69,13 @@ public class MySQLGameDAO implements GameDAO{
     public void updateGame(GameData data) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "UPDATE gameTable SET game = ? WHERE gameID = ?"
+                     "UPDATE gameTable SET whiteUserName = ?, blackUserName = ?, game = ? WHERE gameID = ?"
              )) {
             String gameJson = new Gson().toJson(data.getGame());
-            preparedStatement.setString(1, gameJson);
-            preparedStatement.setInt(2, data.getGameID());
+            preparedStatement.setString(1, data.getWhiteUsername());
+            preparedStatement.setString(2, data.getBlackUsername());
+            preparedStatement.setString(3, gameJson);
+            preparedStatement.setInt(4, data.getGameID());
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 0) {
                 throw new DataAccessException("Error: No rows updated. GameID " + data.getGameID() + " not found.");

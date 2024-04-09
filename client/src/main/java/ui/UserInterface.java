@@ -9,7 +9,6 @@ import requests.JoinGameRequest;
 import requests.LoginRequest;
 import responses.CreateGameResponse;
 import responses.ListGamesResponse;
-import server.Server;
 import server.ServerFacade;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
@@ -49,16 +48,17 @@ public class UserInterface implements NotificationHandler {
                 System.out.println("NOTIFICATION");
                 NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
                 System.out.println(SET_TEXT_COLOR_RED + notification.getMessage() + SET_TEXT_COLOR_WHITE);
-                System.out.print("[PLAYING_GAME] >>> ");
+                printUserTerminal();
                 break;
             case LOAD_GAME:
                 System.out.println("LOAD_GAME");
                 LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
                 printChessBoard(loadGame.getGame().getBoard());
-                System.out.print("[PLAYING_GAME] >>> ");
+                printUserTerminal();
                 break;
             case ERROR:
                 System.out.println("ERROR");
+                printUserTerminal();
                 break;
         }
     }
@@ -90,6 +90,18 @@ public class UserInterface implements NotificationHandler {
             printChessBoardToTerminalBlack(board);
         }
         else printChessBoardToTerminalWhite(board);
+    }
+
+    private void printUserTerminal(){
+        if(isInGamePlay){
+            System.out.print("[PLAYING_GAME] >>> ");
+        }
+        else if(isLoggedin){
+            System.out.print("[LOGGED_IN] >>> ");
+        }
+        else if(!isLoggedin){
+            System.out.print("[LOGGED_OUT] >>> ");
+        }
     }
 
     private String[] readCommand(){
@@ -131,6 +143,7 @@ public class UserInterface implements NotificationHandler {
                 try{
                     wsFacade.leaveChessGame(authToken, gameID);
                     System.out.println("Leaving game");
+                    isInGamePlay = false;
                 }catch(ResponseException e){
                     System.out.println(e.getMessage());
                 }

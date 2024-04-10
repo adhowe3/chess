@@ -45,12 +45,8 @@ public class ChessBoardPrinter {
 
         for(int row = 8; row >= 1; row--){
             for(int col = 8; col >= 1; col--){
-                if(validPositions.contains(new ChessPosition(row, col))){
-                    printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
-                }
-                else{
-                    printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
-                }
+                if(validPositions.contains(new ChessPosition(row, col))) printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
+                else printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
                 backgroundColor = flipBgColor(backgroundColor);
             }
             System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);
@@ -83,12 +79,8 @@ public class ChessBoardPrinter {
 
         for(int row = 1; row < 9; row++){
             for(int col = 1; col < 9; col++){
-                if(validPositions.contains(new ChessPosition(row, col))){
-                    printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
-                }
-                else{
-                    printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
-                }
+                if(validPositions.contains(new ChessPosition(row, col))) printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
+                else printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
                 backgroundColor = flipBgColor(backgroundColor);
             }
             System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);

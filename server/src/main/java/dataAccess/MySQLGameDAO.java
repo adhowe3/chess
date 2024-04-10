@@ -91,12 +91,7 @@ public class MySQLGameDAO implements GameDAO{
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "UPDATE gameTable SET whiteUsername = ? WHERE gameID = ?"
              )) {
-            preparedStatement.setString(1, username);
-            preparedStatement.setInt(2, gameID);
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new DataAccessException("Error: bad request");
-            }
+            updateName(preparedStatement, gameID, username);
         } catch (SQLException e) {
             throw new DataAccessException("Error: Failed to update whiteUsername for gameID " + gameID + ": " + e.getMessage());
         }
@@ -107,16 +102,25 @@ public class MySQLGameDAO implements GameDAO{
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "UPDATE gameTable SET blackUsername = ? WHERE gameID = ?"
              )) {
+            updateName(preparedStatement, gameID, username);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: Failed to update blackUsername for gameID " + gameID + ": " + e.getMessage());
+        }
+    }
+
+    private void updateName(PreparedStatement preparedStatement, int gameID, String username) throws DataAccessException{
+        try{
             preparedStatement.setString(1, username);
             preparedStatement.setInt(2, gameID);
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 0) {
                 throw new DataAccessException("Error: bad request");
             }
-        } catch (SQLException e) {
+        }catch (SQLException e) {
             throw new DataAccessException("Error: Failed to update blackUsername for gameID " + gameID + ": " + e.getMessage());
         }
     }
+
     @Override
     public int nextGameID() throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection();

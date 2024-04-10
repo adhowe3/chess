@@ -45,9 +45,7 @@ public class ChessBoardPrinter {
 
         for(int row = 8; row >= 1; row--){
             for(int col = 8; col >= 1; col--){
-                if(validPositions.contains(new ChessPosition(row, col))) printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
-                else printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
-                backgroundColor = flipBgColor(backgroundColor);
+                backgroundColor = printSquareHighlightAndFlipBG(validPositions, row, col, backgroundColor, board);
             }
             System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);
             if(row > 1) System.out.print(SET_BG_COLOR_BLACK+ " " + (row-1) + " ");
@@ -79,21 +77,26 @@ public class ChessBoardPrinter {
 
         for(int row = 1; row < 9; row++){
             for(int col = 1; col < 9; col++){
-                if(validPositions.contains(new ChessPosition(row, col))) printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
-                else printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
-                backgroundColor = flipBgColor(backgroundColor);
+                backgroundColor = printSquareHighlightAndFlipBG(validPositions, row, col, backgroundColor, board);
             }
             System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + SET_BG_COLOR_DARK_GREY);
             if(row < 8) System.out.print(SET_BG_COLOR_BLACK+ " " + (row+1) + " ");
             backgroundColor = flipBgColor(backgroundColor);
         }
-
         System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + EMPTY);
         for(int i = 0; i < 8; i++){
             System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + backwardLetters[i]);
         }
         System.out.println(EMPTY  + SET_BG_COLOR_DARK_GREY);
     }
+
+    private String printSquareHighlightAndFlipBG(Collection<ChessPosition> validPositions, int row, int col, String backgroundColor, ChessBoard board){
+        if(validPositions.contains(new ChessPosition(row, col))) printSquareToTerminal(setHighlightColor(backgroundColor), board.getPiece(new ChessPosition(row,col)));
+        else printSquareToTerminal(backgroundColor, board.getPiece(new ChessPosition(row,col)));
+        backgroundColor = flipBgColor(backgroundColor);
+        return backgroundColor;
+    }
+
 
     private String[] printLettersTop(String spacing) {
         String[] backwardLetters = {(" h"+spacing), (" g"+spacing), (" f"+spacing), (" e"+spacing), (" d"+spacing), (" c"+spacing), (" b"+spacing), " a\u2005"};

@@ -16,16 +16,13 @@ import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-
 import java.util.*;
-
 import static ui.EscapeSequences.*;
 
 public class UserInterface implements NotificationHandler {
 
     private Scanner scanner = new Scanner(System.in);
     private ServerFacade server;
-
     private boolean isLoggedin = false;
     private boolean isInGamePlay = false;
 
@@ -336,7 +333,9 @@ public class UserInterface implements NotificationHandler {
                         server.joinGame(observeReq);
                         isInGamePlay = true;
                         isObserver = true;
+                        gameID = observeReq.getgameID();
                         this.wsFacade = new WebSocketFacade(server.getServerUrl(), this);
+                        this.wsFacade.observeChessGame(observeReq.getAuthorization(), observeReq.getgameID());
                     } catch (ResponseException e) {
                         System.out.println(e.getMessage());
                     }

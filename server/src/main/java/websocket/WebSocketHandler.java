@@ -173,6 +173,11 @@ public class WebSocketHandler {
             connections.broadcast("", command.getGameID(), loadGameMessage);
             System.out.println("broadcasting loadGameMessage from makeMove");
 
+            if(gameData.getGame().isGameIsOver()){
+                NotificationMessage notification = new NotificationMessage(authData.getUsername() + " won");
+                connections.broadcast("", command.getGameID(), notification);
+            }
+
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s moved: %s", authData.getUsername(), move));
             connections.broadcast(auth, command.getGameID(), notificationMessage);
 
